@@ -1,0 +1,160 @@
+%\documentclass[14pt]{extarticle}
+\documentclass[11pt]{article}
+\usepackage{natbib}
+\usepackage[dvipdfm,colorlinks=true,urlcolor=DarkBlue,linkcolor=DarkBlue,bookmarks=false,citecolor=DarkBlue]{hyperref}
+
+\usepackage[pdftex]{graphicx}
+\usepackage{fancyhdr}
+\usepackage[T1]{fontenc}
+\usepackage{palatino}
+\usepackage[utf8]{inputenc}
+%\usepackage[super]{nth}
+\usepackage{setspace}
+\usepackage{placeins}
+\usepackage{subfigure}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage{marvosym}  % Used for euro symbols with \EUR
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\usepackage{longtable} %% Allows the use of the longtable format produced by xl2latex.rb
+\usepackage{lscape} %% Allows landscape orientation of tables
+\usepackage{appendix} %% Allows customization of the appendix properties
+\setcounter{tocdepth}{1} %% Restricts the table of contents to the section header level entries only
+
+\usepackage{geometry}
+\geometry{letterpaper}
+\usepackage{amsmath}
+\usepackage[stable]{footmisc}
+
+%% The following settings are for the listings environment in R
+\usepackage{listings}
+\usepackage[svgnames]{xcolor}
+\usepackage{soul}
+\sethlcolor{LightGoldenrodYellow}
+\lstset{backgroundcolor=\color{LightYellow}}
+\lstset{framextopmargin=6pt, framexbottommargin=6pt, framerule=4pt, rulecolor=\color{White}}
+
+\title{Individual-level evidence of IT skill specialization and formation
+  in the advanced industrial economies\thanks{}}
+\author{Mark Huberty\thanks{Travers Department of Political Science,
+    University of California, Berkeley. Contact:
+    \url{markhuberty@berkeley.edu}.}}
+\date{\today}
+
+\graphicspath{{../figures/}
+
+\begin{document}
+
+\maketitle
+\doublespacing
+
+\section{Introduction}
+\label{sec:introduction}
+ 
+I present new evidence of comparative patterns of specialization and
+technology adoption in the advanced industrial economies. 
+
+\section{Institutions and skill development}
+\label{sec:inst-skill-devel}
+
+
+Theories of comparative political economy predict that institutional
+variation in the advanced industrial economy will create diverging
+patterns of skill formation in workers, and in technology adoption and
+exploitation among firms. The Varieties of Capitalism literature in
+particular \citep{Hall:2001} makes two predictions about technology
+and skills: first, that workers in more liberal economies
+will adopt more general skills than their counterparts in coordinated
+economies; and second, that firms in liberal economies will be more
+likely to engage in radical innovation and adopt leading-edge
+technology. 
+
+Empricially, the evidence used to support these claims has typically
+relied on macro-level measures of skill formation, including
+rates university versus vocational training, patenting rates across
+different kinds of technology, and aggregate R\&D
+spending.\footnote{For a full set of metrics, see
+  \cite{hall2009varieties}.} But these metrics do not directly measure
+worker-level behavior.
+
+\section{Data}
+\label{sec:data}
+
+I exploit a new dataset on technology adoption and skill formation in
+the information technology industry. That dataset provides
+individual-level evidence of cross-sectional and intertemporal
+patterns of skill formation among workers worldwide, and augments that
+data with measures of expertise and evidence of patterns of worker
+interaction. 
+
+StackExchange represents a collection of community-created and
+maintained internet sites that field questions and answers on topics related to information
+technology. Begun in 2008 by Joel Spolsky and colleagues, it has grown
+into one of the most comprehensive communities of technical
+information in the world. As of 2011, it reported over () questions,
+() users, and () daily page views. It had grown from its initial site,
+StackOverflow\footnote{In programming parlance, a stack overflow
+  refers to a program condition in which memory usage exceeds
+  memory allocation, causing a program crash. Hence StackOverflow is,
+  in a sense, excess memory for humans.}, to sites covering everything
+from programming to data security to cooking and philosophy. 
+
+The format of StackExchange interactions can be stylized as follows: a
+user poses a question and tags the question with metadata related to
+the specific technologies or technological domains the question
+pertains to. Other users respond to the question. Those responses, in
+turn, are rated by respondents, the person who posed the original
+question, and other community members, on the basis of accuracy,
+solution elegance, and completeness. Questions and answers can be
+retrieved by querying metadata, the user ID of the questioner or
+answerer, and other boolean search terms. 
+
+Users contribute to StackExchange through user accounts that contain a
+range of information about the user. Users may, but are not required
+to, provide information about their geographic location, interests,
+website address, and other personal characteristics. There is no
+evidence that this data is validated, and avatars or similarly
+obscured or stylized user names and identities are permitted. 
+
+%% Things to think about here: answered vs. unanswered questions;
+%% multiple tags, community-modded responses, etc.
+
+All StackExchange data is collected and published under a Creative
+Commons license. In keeping with the license, StackExchange releases
+a bi-monthly dump of its entire dataset, including the full record of
+questions and answers, user profiles, record tagging and metadata, and
+time stamps. The data are anonymized with respect to user names but
+not other user metadata, including geographic location, web site,
+the questions posed or answered by each user, and the
+user's community-determined ``reputation''.\footnote{For more
+  information on the StackExchange data dump, see \url{}. For information
+  on how the data are rendered anonymous, see \url{}. For information
+  on the terms of use for the Creative Commons license, see \url{}.}
+
+These data therefore represent a rich trove of information about the
+interaction of IT workers worldwide. The dataset contains not only the location
+and other information about the community members themselves, but also,
+through the information on questions posed and answered and their reputation, the
+kinds of technology they work with and are expert in, and their rating by
+a community of their peers. 
+
+ 
+
+
+\section{Research Design}
+\label{sec:research-design}
+
+\section{Results}
+\label{sec:results}
+
+\section{Discussion}
+\label{sec:discussion}
+
+\section{Conclusions}
+\label{sec:conclusions}
+
+
+\FloatBarrier
+\bibliography{/bibs/VOC_Bib}
+\bibliographystyle{apalike}
+\end{document}

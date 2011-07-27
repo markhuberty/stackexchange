@@ -1,0 +1,28 @@
+;; RefTeX parse info file
+;; File: /Users/markhuberty/Documents/Research/Papers/stackexchange/proposal.tex
+;; User: markhuberty (Mark Huberty)
+
+(set reftex-docstruct-symbol '(
+
+
+(xr nil "\\\\\\\\\\\\")
+
+(index-tags)
+
+(is-multi nil)
+
+(bibview-cache)
+
+(master-dir . "/Users/markhuberty/Documents/Research/Papers/stackexchange/")
+
+(label-numbers)
+
+(bof "/Users/markhuberty/Documents/Research/Papers/stackexchange/proposal.tex")
+
+(toc "toc" "    1 The proposal" "/Users/markhuberty/Documents/Research/Papers/stackexchange/proposal.tex" nil 2 "1" "\\section{The proposal}" 2228)
+
+("sec:proposal" "s" nil "/Users/markhuberty/Documents/Research/Papers/stackexchange/proposal.tex" nil "")
+
+(eof "/Users/markhuberty/Documents/Research/Papers/stackexchange/proposal.tex")
+))
+
