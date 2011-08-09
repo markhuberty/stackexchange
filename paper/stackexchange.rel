@@ -1,0 +1,54 @@
+;; RefTeX parse info file
+;; File: /Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex
+;; User: markhuberty (Mark Huberty)
+
+(set reftex-docstruct-symbol '(
+
+
+(xr nil "\\\\\\\\\\\\")
+
+(index-tags)
+
+(is-multi nil)
+
+(bibview-cache ("hall2009varieties" . "Hall & Gingerich 2009, Vari. capit. inst. compl. polit., British Journal of Political Science 39:449") ("Hall:2001" . "Peter Hall & David Soskice 2001, Varieties Capitalism"))
+
+(master-dir . "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/")
+
+(label-numbers)
+
+(bof "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex")
+
+(toc "toc" "    1 Introduction" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "1" "\\section{Introduction}" 1669)
+
+("sec:introduction" "s" "Theories of comparative political economy predict that institutional variation in the advanced indus" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+
+(toc "toc" "    2 Institutions and skill development" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "2" "\\section{Institutions and skill development}" 1848)
+
+("sec:inst-skill-devel" "s" "\\section{Data}  \\section{Research Design} \\label{sec:research-design} \\section{Results} \\label{sec:r" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+
+(toc "toc" "    3 Data" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "3" "\\section{Data}" 2932)
+
+("sec:data" "s" "\\section{Research Design}  \\section{Results} \\label{sec:results} \\section{Discussion} \\label{sec:dis" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+
+(toc "toc" "    4 Research Design" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "4" "\\section{Research Design}" 6505)
+
+("sec:research-design" "s" "\\section{Results}  \\section{Discussion} \\label{sec:discussion} \\section{Conclusions} \\label{sec:conc" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+
+(toc "toc" "    5 Results" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "5" "\\section{Results}" 6560)
+
+("sec:results" "s" "\\section{Discussion}  \\section{Conclusions} \\label{sec:conclusions} \\FloatBarrier \\bibliography{/bib" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+
+(toc "toc" "    6 Discussion" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "6" "\\section{Discussion}" 6599)
+
+("sec:discussion" "s" "\\section{Conclusions}  \\FloatBarrier \\bibliography{/bibs/VOC_Bib} \\bibliographystyle{apalike} " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+
+(toc "toc" "    7 Conclusions" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "7" "\\section{Conclusions}" 6644)
+
+("sec:conclusions" "s" "\\FloatBarrier \\bibliography{/bibs/VOC_Bib} \\bibliographystyle{apalike} " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+
+(bib "/bibs/VOC_Bib.bib")
+
+(eof "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex")
+))
+
