@@ -1,0 +1,7 @@
+Import process:
+1. Create db in mysql titled 'stackoverflow'
+2. Grant all privileges to markhuberty
+3. Run the schema via batch, to create necessary tables
+	As in mysql --user=markhuberty --password=overflowpwd stackoverflow < 
+	stack_overflow.sql > output.log
+4. Run the MySQL_Importer.php script to load the tables
