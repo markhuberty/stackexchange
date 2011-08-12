@@ -16,6 +16,8 @@ conn = MySQLdb.connect(host="localhost",
 
 conn_cursor = conn.cursor()
 conn_cursor.execute("SELECT TAGS FROM posts")
+
+## Note tag_data here is a tuple of strings
 tag_data = conn_cursor.fetchall()
 
 conn_cursor.close()
@@ -28,8 +30,10 @@ p_split = re.compile("><")
 
 tag_list = []
 for tag in tag_data:
-    tag_temp = p_delete.sub("", tag)
+    tag_temp = p_delete.sub("", tag[0])
     tag_list.append(p_split.split(tag_temp))
+
+del tag_data
 
 ## Taken from here: http://www.peterbe.com/plog/uniqifiers-benchmark
 def uniquify(seq, idfun=None):  
