@@ -111,7 +111,11 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split, filename):
 to_delete = "^[<]{1}|[>]{1}$"
 to_split = "><"
 filename = '../data/sparse_tag_matrix.csv'
-mat_out = generate_sparse_tag_matrix(tag_data, to_delete, to_split, filename)
+mat_out = generate_sparse_tag_matrix(tag_vec = tag_data, 
+                                     to_delete = to_delete, 
+                                     to_split = to_split, 
+                                     filename = filename
+                                     )
 
 # with open('sparse_tag_matrix.csv', 'wt') as f:
 #     writer = csv.writer(f)
