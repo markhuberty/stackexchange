@@ -16,7 +16,7 @@ conn = MySQLdb.connect(host="localhost",
 
 conn_cursor = conn.cursor()
 conn_cursor.execute("SELECT TAGS FROM posts")
-tag_data = conn_cursor.fetch()
+tag_data = conn_cursor.fetchall()
 
 conn_cursor.close()
 conn.close()
