@@ -75,7 +75,7 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
         temp_vec = [0] * len(unique_tags)
         idxs = []
         for tag in tag_group:
-            idxs = unique_tags.index(tag)
+            idxs.append(unique_tags.index(tag))
 
         temp_vec[idxs] = 1
         sparse_tag_array.append(temp_vec)
