@@ -5,7 +5,7 @@ import re
 import csv
 import os
 
-os.chdir("../data/")
+#os.chdir("../data/")
 
 ## Read in the tag vector from the database
 conn = MySQLdb.connect(host="localhost",
@@ -24,14 +24,18 @@ conn_cursor.close()
 conn.close()
 ## End data read-in
 
-## Begin parse
-p_delete = re.compile("^[<]{1}|[>]{1}$")
-p_split = re.compile("><")
+# ## Begin parse
+# p_delete = re.compile("^[<]{1}|[>]{1}$")
+# p_split = re.compile("><")
 
 # tag_list = []
+# all_tags = []
 # for tag in tag_data:
 #     tag_temp = p_delete.sub("", tag[0])
-#     tag_list.append(p_split.split(tag_temp))
+#     tag_split = p_split.split(tag_temp)
+#     tag_list.append(tag_split)
+#     if tag_split[0] != '':
+#         all_tags.extend(tag_split)
 
 # del tag_data
 
@@ -52,6 +56,15 @@ def uniquify(seq, idfun=None):
         result.append(item) 
     return result
 
+# unique_tags = uniquify(seq = all_tags)
+
+# for tag_group in tag_list:
+#     temp_vec = [0] * len(unique_tags)
+#     for tag in tag_group:
+#         if tag != '':
+#             temp_vec.insert(unique_tags.index(tag), 1)
+#     sparse_tag_array.append(temp_vec)
+
 ## 
 def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
     tag_list = []
@@ -59,12 +72,14 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
 
     p_delete = re.compile(to_delete)
     p_split = re.compile(to_split)
-
+    
     ## Get the unique tag set
     for tag in tag_vec:        
         tag_temp = p_delete.sub("", tag[0])
-        tag_list.append(p_split.split(tag_temp))
-        all_tags = all_tags + [tag_temp]
+        tag_split = p_split.split(tag_temp)
+        tag_list.append(tag_split)
+        if tag_split[0] != '':
+            all_tags.extend(tag_temp)
 
     unique_tags = uniquify(seq = all_tags)
 
@@ -73,11 +88,10 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
 
     for tag_group in tag_list:
         temp_vec = [0] * len(unique_tags)
-        idxs = []
         for tag in tag_group:
-            idxs.append(unique_tags.index(tag))
+            if tag != '':
+                temp_vec.insert(unique_tags.index(tag))
 
-        temp_vec[idxs] = 1
         sparse_tag_array.append(temp_vec)
 
     return(sparse_tag_array)
