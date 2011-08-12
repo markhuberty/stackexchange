@@ -10,7 +10,7 @@ library(RMySQL)
 library(stringr)
 library(foreach)
 library(doMC)
-registerDoMC(3)
+registerDoMC(2)
 
 username = "markhuberty"
 password = "overflowpwd"
@@ -32,7 +32,7 @@ if(parse.tag.list)
 
 
     tags.vec <- as.character(tags[,1])
-    rm(tag)
+    rm(tags)
     gc()
 
     tags.vec <- gsub("^[<]{1}", "", tags.vec)
@@ -44,7 +44,7 @@ if(parse.tag.list)
 
 rm(list=ls())
 gc()
-load("./data/tag.list.RData")
+load("./data/tags.list.RData")
 
 format.sparse.matrix <- function(list.in){
 
