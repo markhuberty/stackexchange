@@ -25,17 +25,17 @@ conn.close()
 ## End data read-in
 
 # ## Begin parse
-p_delete = re.compile("^[<]{1}|[>]{1}$")
-p_split = re.compile("><")
+# p_delete = re.compile("^[<]{1}|[>]{1}$")
+# p_split = re.compile("><")
 
-tag_list = []
-all_tags = []
-for tag in tag_data:
-    tag_temp = p_delete.sub("", tag[0])
-    tag_split = p_split.split(tag_temp)
-    tag_list.append(tag_split)
-    if tag_split[0] != '':
-        all_tags.extend(tag_split)
+# tag_list = []
+# all_tags = []
+# for tag in tag_data:
+#     tag_temp = p_delete.sub("", tag[0])
+#     tag_split = p_split.split(tag_temp)
+#     tag_list.append(tag_split)
+#     if tag_split[0] != '':
+#         all_tags.extend(tag_split)
 
 # del tag_data
 
@@ -56,17 +56,17 @@ def uniquify(seq, idfun=None):
         result.append(item) 
     return result
 
-unique_tags = uniquify(seq = all_tags)
+# unique_tags = uniquify(seq = all_tags)
 
-sparse_tag_array = [unique_tags]
+# sparse_tag_array = [unique_tags]
 
-for tag_group in tag_list:
-    #temp_vec = [0] * len(unique_tags)
-    for tag in tag_group:
-        if tag != '':
-            #temp_vec.insert(unique_tags.index(tag), 1)
-            unique_tags.index(tag)
-    #sparse_tag_array.append(temp_vec)
+# for tag_group in tag_list:
+#     #temp_vec = [0] * len(unique_tags)
+#     for tag in tag_group:
+#         if tag != '':
+#             #temp_vec.insert(unique_tags.index(tag), 1)
+#             unique_tags.index(tag)
+#     #sparse_tag_array.append(temp_vec)
 
 
 
