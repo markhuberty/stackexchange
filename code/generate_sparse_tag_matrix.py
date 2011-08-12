@@ -24,7 +24,7 @@ conn_cursor.close()
 conn.close()
 ## End data read-in
 
-# ## Begin parse
+# # ## Begin parse
 # p_delete = re.compile("^[<]{1}|[>]{1}$")
 # p_split = re.compile("><")
 
@@ -37,24 +37,24 @@ conn.close()
 #     if tag_split[0] != '':
 #         all_tags.extend(tag_split)
 
-# del tag_data
+# # del tag_data
 
-## Taken from here: http://www.peterbe.com/plog/uniqifiers-benchmark
-def uniquify(seq, idfun=None):  
-    # order preserving 
-    if idfun is None: 
-        def idfun(x): return x 
-    seen = {} 
-    result = [] 
-    for item in seq: 
-        marker = idfun(item) 
-        # in old Python versions: 
-        # if seen.has_key(marker) 
-        # but in new ones: 
-        if marker in seen: continue 
-        seen[marker] = 1 
-        result.append(item) 
-    return result
+# ## Taken from here: http://www.peterbe.com/plog/uniqifiers-benchmark
+# def uniquify(seq, idfun=None):  
+#     # order preserving 
+#     if idfun is None: 
+#         def idfun(x): return x 
+#     seen = {} 
+#     result = [] 
+#     for item in seq: 
+#         marker = idfun(item) 
+#         # in old Python versions: 
+#         # if seen.has_key(marker) 
+#         # but in new ones: 
+#         if marker in seen: continue 
+#         seen[marker] = 1 
+#         result.append(item) 
+#     return result
 
 # unique_tags = uniquify(seq = all_tags)
 
@@ -67,7 +67,6 @@ def uniquify(seq, idfun=None):
 #             #temp_vec.insert(unique_tags.index(tag), 1)
 #             unique_tags.index(tag)
 #     #sparse_tag_array.append(temp_vec)
-
 
 
 
@@ -86,7 +85,7 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split, filename):
         tag_split = p_split.split(tag_temp)
         tag_list.append(tag_split)
         if tag_split[0] != '':
-            all_tags.extend(tag_temp)
+            all_tags.extend(tag_split)
 
     unique_tags = uniquify(seq = all_tags)
 
