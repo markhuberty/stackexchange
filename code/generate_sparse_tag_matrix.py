@@ -91,10 +91,11 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split, filename):
     unique_tags = uniquify(seq = all_tags)
 
     ## parse the tag list into an indicator matrix
-    sparse_tag_array = [unique_tags]
 
-    with open(filename), 'wt') as f:
+    with open(filename, 'wt') as f:
         writer = csv.writer(f)
+        writer.writerow(unique_tags)
+
         for tag_group in tag_list:
             temp_vec = [0] * len(unique_tags)
             for tag in tag_group:
