@@ -28,12 +28,12 @@ conn.close()
 p_delete = re.compile("^[<]{1}|[>]{1}$")
 p_split = re.compile("><")
 
-tag_list = []
-for tag in tag_data:
-    tag_temp = p_delete.sub("", tag[0])
-    tag_list.append(p_split.split(tag_temp))
+# tag_list = []
+# for tag in tag_data:
+#     tag_temp = p_delete.sub("", tag[0])
+#     tag_list.append(p_split.split(tag_temp))
 
-del tag_data
+# del tag_data
 
 ## Taken from here: http://www.peterbe.com/plog/uniqifiers-benchmark
 def uniquify(seq, idfun=None):  
@@ -55,13 +55,14 @@ def uniquify(seq, idfun=None):
 ## 
 def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
     tag_list = []
+    all_tags = []
+
     p_delete = re.compile(to_delete)
     p_split = re.compile(to_split)
 
     ## Get the unique tag set
-    all_tags = []
     for tag in tag_vec:        
-        tag_temp = p_delete.sub("", tag)
+        tag_temp = p_delete.sub("", tag[0])
         tag_list.append(p_split.split(tag_temp))
         all_tags = all_tags + tag
 
@@ -83,7 +84,11 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
 
 
 ## Generate the resulting csv file
-mat_out = generate_sparse_tag_marix(tag_list)
+
+to_delete = "^[<]{1}|[>]{1}$"
+to_split = "><"
+mat_out = generate_sparse_tag_marix(tag_data, to_delete, to_split)
+
 with open('sparse_tag_matrix.csv', 'wt') as f:
     writer = csv.writer(f)
     for row in mat_out:
