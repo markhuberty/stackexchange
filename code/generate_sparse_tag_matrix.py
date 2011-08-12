@@ -5,7 +5,7 @@ import re
 import csv
 import os
 
-os.chgwd()
+os.chdir("../data/")
 
 ## Read in the tag vector from the database
 conn = MySQLdb.connect(host="localhost",
