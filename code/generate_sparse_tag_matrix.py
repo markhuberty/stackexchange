@@ -94,14 +94,14 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split, filename):
 
     with open(filename, 'wt') as f:
         writer = csv.writer(f)
-        writer.writerow(unique_tags)
+        writer.writerow(tuple(unique_tags))
 
         for tag_group in tag_list:
             temp_vec = [0] * len(unique_tags)
             for tag in tag_group:
                 if tag != '':
-                    temp_vec.insert(unique_tags.index(tag), 1)
-            writer.writerow(temp_vec)
+                    temp_vec[unique_tags.index(tag)] = 1
+            writer.writerow(tuple(temp_vec))
 
     return('Done')
 
