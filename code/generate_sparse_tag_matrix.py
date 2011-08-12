@@ -9,7 +9,7 @@ os.chdir("../data/")
 
 ## Read in the tag vector from the database
 conn = MySQLdb.connect(host="localhost",
-                       user="markhuberty"
+                       user="markhuberty",
                        passwd="overflowpwd",
                        db="stackoverflow"
                        )
