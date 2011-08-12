@@ -10,7 +10,7 @@ library(RMySQL)
 library(stringr)
 library(foreach)
 library(doMC)
-registerDoMC(3)
+registerDoMC(2)
 
 username = "markhuberty"
 password = "overflowpwd"
