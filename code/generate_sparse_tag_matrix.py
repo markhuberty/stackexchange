@@ -93,8 +93,8 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
             row_dim += 1
             if (row_dim % 10000) == 0:
                 print row_dim
-                print 'Row coord length' + len(row_coord)
-                print 'Col coord length' + len(col_coord)
+                print 'Row coord length' + str(len(row_coord))
+                print 'Col coord length' + str(len(col_coord))
 
         # for tag in tag_group:
         #     if tag != '':
