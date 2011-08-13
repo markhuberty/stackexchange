@@ -1,9 +1,15 @@
 ## Alternative to R file of the same name
-
+## NOTE: this doesn't really work well right now
+## Needs to use scipy to build a sparse matrix and do 
+## algebra on it. 
+## Also need to change the SQL query to extract only the tags 
+## that aren't blank. 
 import MySQLdb
 import re
 import csv
 import os
+import scipy
+import scipy.sparse
 
 #os.chdir("../data/")
 
@@ -15,7 +21,7 @@ conn = MySQLdb.connect(host="localhost",
                        )
 
 conn_cursor = conn.cursor()
-conn_cursor.execute("SELECT TAGS FROM posts")
+conn_cursor.execute("SELECT TAGS FROM posts WHERE tags != \"\"")
 
 ## Note tag_data here is a tuple of strings
 tag_data = conn_cursor.fetchall()
@@ -24,22 +30,7 @@ conn_cursor.close()
 conn.close()
 ## End data read-in
 
-# # ## Begin parse
-# p_delete = re.compile("^[<]{1}|[>]{1}$")
-# p_split = re.compile("><")
-
-# tag_list = []
-# all_tags = []
-# for tag in tag_data:
-#     tag_temp = p_delete.sub("", tag[0])
-#     tag_split = p_split.split(tag_temp)
-#     tag_list.append(tag_split)
-#     if tag_split[0] != '':
-#         all_tags.extend(tag_split)
-
-# # del tag_data
-
-# ## Taken from here: http://www.peterbe.com/plog/uniqifiers-benchmark
+## Taken from here: http://www.peterbe.com/plog/uniqifiers-benchmark
 def uniquify(seq, idfun=None):  
     # order preserving 
     if idfun is None: 
@@ -56,30 +47,20 @@ def uniquify(seq, idfun=None):
         result.append(item) 
     return result
 
-# unique_tags = uniquify(seq = all_tags)
-
-# sparse_tag_array = [unique_tags]
-
-# for tag_group in tag_list:
-#     #temp_vec = [0] * len(unique_tags)
-#     for tag in tag_group:
-#         if tag != '':
-#             #temp_vec.insert(unique_tags.index(tag), 1)
-#             unique_tags.index(tag)
-#     #sparse_tag_array.append(temp_vec)
-
-
-
-
-## 
-def generate_sparse_tag_matrix(tag_vec, to_delete, to_split, filename):
+## Takes the vector of tags as a list of strings with regularized
+## separators (as , for instance, wtih XML, (<tag1><tag2><tag3>), 
+## parses the tags into a list of lists, 
+## one for each entry in the vector, and then writes the result
+## to a sparse matrix of dimension ROWS * COUNT(unique_tags)
+def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
     tag_list = []
     all_tags = []
 
     p_delete = re.compile(to_delete)
     p_split = re.compile(to_split)
     
-    ## Get the unique tag set
+    ## Parse each set of tags into a list
+    ## as in <tag1><tag2><tag3> -> [tag1, tag2, tag3]
     for tag in tag_vec:        
         tag_temp = p_delete.sub("", tag[0])
         tag_split = p_split.split(tag_temp)
@@ -87,40 +68,51 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split, filename):
         if tag_split[0] != '':
             all_tags.extend(tag_split)
 
+    ## Generate a list of unique tags
     unique_tags = uniquify(seq = all_tags)
 
-    ## parse the tag list into an indicator matrix
+    ## Declare three lists to hold the coordinates and values
+    row_coord = []
+    col_coord = []
+    cell_value = []
+    col_dim = len(unique_tags)
+    row_dim = len(tag_list)
 
-    with open(filename, 'wt') as f:
-        writer = csv.writer(f)
-        writer.writerow(tuple(unique_tags))
+    ## Loop down the list of tag lists
+    ## and write their indices based on the 
+    ## indices in the unique_tags vector
+    ## NOTE: empty records have 0 entries for the entire row
+    for tag_group in tag_list:
+        for tag in tag_group:
+            if tag != '':
+                row_coord.append(tag_list.index(tag_group))
+                col_coord.append(unique_tags.index(tag))
+                cell_value.append(1)
+                
 
-        for tag_group in tag_list:
-            temp_vec = [0] * len(unique_tags)
-            for tag in tag_group:
-                if tag != '':
-                    temp_vec[unique_tags.index(tag)] = 1
-            writer.writerow(tuple(temp_vec))
+    ## Declare and populate the sparse matrix
+    mat_out = csc_matrix(array(cell_value),
+                         (array(row_coord), array(col_coord)),
+                         shape=(row_dim, col_dim)
+                         )
 
-    return('Done')
+    list_out = [unique_tags, mat_out]
+    return(list_out)
 
 
-## Generate the resulting csv file
-
+## Generate the sparse matrix
 to_delete = "^[<]{1}|[>]{1}$"
 to_split = "><"
-filename = '../data/sparse_tag_matrix.csv'
-mat_out = generate_sparse_tag_matrix(tag_vec = tag_data, 
-                                     to_delete = to_delete, 
-                                     to_split = to_split, 
-                                     filename = filename
-                                     )
-
-# with open('sparse_tag_matrix.csv', 'wt') as f:
-#     writer = csv.writer(f)
-#     for row in mat_out:
-#         writer.writerow(row)
-
+filename = '../data/sparse_tag_matrix'
+tag_object = generate_sparse_tag_matrix(tag_vec = tag_data, 
+                                        to_delete = to_delete, 
+                                        to_split = to_split
+                                        )
+ 
+## Write the file out
+## Pickle dump here or similar
+with open(filename, 'wt') as f:
+    pickle.dump(tag_object, f)
 
     
                         
