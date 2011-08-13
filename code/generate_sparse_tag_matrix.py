@@ -85,8 +85,8 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
     ## NOTE: empty records have 0 entries for the entire row
     for tag_group in tag_list:
         if tag_group[0] != '':
-            row_coord.append(map(tag_list.index, tag_group))
-            col_coord.append(map(unique_tags.index, tag_group))
+            row_coord.append(tag_list.index(tag_group) * len(tag_group))
+            col_coord.append(map(unique_tags.index, [tag_group]))
             cell_value.append([1] * len(tag_group))
 
         # for tag in tag_group:
