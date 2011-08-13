@@ -71,7 +71,8 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
     ## Generate a list of unique tags
     unique_tags = uniquify(seq = all_tags)
 
-    ## Declare three lists to hold the coordinates and values
+    ## Declare three lists to hold the coordinates and value
+    print 'Tags split and collected, writing indices's
     row_coord = []
     col_coord = []
     cell_value = []
@@ -89,7 +90,8 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
                 col_coord.append(unique_tags.index(tag))
                 cell_value.append(1)
                 
-
+                
+    print 'Indices written, generating sparse matrix'
     ## Declare and populate the sparse matrix
     mat_out = csc_matrix(array(cell_value),
                          (array(row_coord), array(col_coord)),
@@ -104,11 +106,14 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
 to_delete = "^[<]{1}|[>]{1}$"
 to_split = "><"
 filename = '../data/sparse_tag_matrix'
+
+print 'Data loaded, initiating function'
 tag_object = generate_sparse_tag_matrix(tag_vec = tag_data, 
                                         to_delete = to_delete, 
                                         to_split = to_split
                                         )
  
+print 'Function done, writing out'
 ## Write the file out
 ## Pickle dump here or similar
 with open(filename, 'wt') as f:
