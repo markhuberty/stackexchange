@@ -87,9 +87,9 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
     gc.disable()
     for tag_group in tag_list:
         if tag_group[0] != '':
-            row_coord.extend(tag_list.index(tag_group) * len(tag_group))
+            row_coord.extend([tag_list.index(tag_group)] * len(tag_group))
             col_coord.extend(map(unique_tags.index, list(tag_group)))
-            cell_value.append([1] * len(tag_group))
+            cell_value.extend([1] * len(tag_group))
             row_dim += 1
             if (row_dim % 10000) == 0:
                 print row_dim
