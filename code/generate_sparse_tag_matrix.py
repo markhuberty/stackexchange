@@ -72,7 +72,7 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
     unique_tags = uniquify(seq = all_tags)
 
     ## Declare three lists to hold the coordinates and value
-    print 'Tags split and collected, writing indices's
+    print 'Tags split and collected, writing indices'
     row_coord = []
     col_coord = []
     cell_value = []
