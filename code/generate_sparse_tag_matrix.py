@@ -10,6 +10,7 @@ import csv
 import os
 import scipy
 import scipy.sparse
+import gc
 
 #os.chdir("../data/")
 
@@ -83,6 +84,7 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
     ## and write their indices based on the 
     ## indices in the unique_tags vector
     ## NOTE: empty records have 0 entries for the entire row
+    gc.disable()
     for tag_group in tag_list:
         if tag_group[0] != '':
             row_coord.append(tag_list.index(tag_group) * len(tag_group))
@@ -100,6 +102,7 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
                 
                 
     print 'Indices written, generating sparse matrix'
+    gc.enable()
     ## Declare and populate the sparse matrix
     mat_out = csc_matrix(array(cell_value),
                          (array(row_coord), array(col_coord)),
