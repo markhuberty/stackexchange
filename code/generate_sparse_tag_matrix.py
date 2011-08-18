@@ -56,45 +56,64 @@ def uniquify(seq, idfun=None):
 def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
     tag_list = []
     all_tags = []
+    tag_idx = []
 
     p_delete = re.compile(to_delete)
     p_split = re.compile(to_split)
     
     ## Parse each set of tags into a list
     ## as in <tag1><tag2><tag3> -> [tag1, tag2, tag3]
-    for tag in tag_vec:        
-        tag_temp = p_delete.sub("", tag[0])
-        tag_split = p_split.split(tag_temp)
-        tag_list.append(tag_split)
-        if tag_split[0] != '':
+    ## Write out a set of parsed tags for each row,
+    ## a vector of all tags, and a list of row indices
+    for tag in tag_vec:
+        if tag[0] != '':
+            tag_temp = p_delete.sub("", tag[0])
+            tag_split = p_split.split(tag_temp)
+            tag_list.append(tag_split)
             all_tags.extend(tag_split)
+            tag_idx.extend(tag_vec.index(tag))
 
     ## Generate a list of unique tags
     unique_tags = uniquify(seq = all_tags)
 
     ## Declare three lists to hold the coordinates and value
     print 'Tags split and collected, writing indices'
-    row_coord = []
-    col_coord = []
-    cell_value = []
-    col_dim = len(unique_tags)
-    row_dim = 0
+    # row_coord = []
+    # col_coord = []
+    # cell_value = []
+    # col_dim = len(unique_tags)
+    # row_dim = 0
 
     ## Loop down the list of tag lists
     ## and write their indices based on the 
     ## indices in the unique_tags vector
     ## NOTE: empty records have 0 entries for the entire row
+    ## NOTE: THIS IS WAY TOO SLOW RIGHT NOW
     gc.disable()
-    for tag_group in tag_list:
-        if tag_group[0] != '':
-            row_coord.extend([tag_list.index(tag_group)] * len(tag_group))
-            col_coord.extend(map(unique_tags.index, list(tag_group)))
-            cell_value.extend([1] * len(tag_group))
-            row_dim += 1
-            if (row_dim % 10000) == 0:
-                print row_dim
-                print 'Row coord length' + str(len(row_coord))
-                print 'Col coord length' + str(len(col_coord))
+    # for tag_group in tag_list:
+    #     if tag_group[0] != '':
+    #         row_coord.extend([tag_list.index(tag_group)] * len(tag_group))
+    #         col_coord.extend(map(unique_tags.index, list(tag_group)))
+    #         cell_value.extend([1] * len(tag_group))
+    #         row_dim += 1
+    #         if (row_dim % 10000) == 0:
+    #             print row_dim
+    #             print 'Row coord length' + str(len(row_coord))
+    #             print 'Col coord length' + str(len(col_coord))
+
+    ## Alt method w/ list comprehensions; might be faster 
+    ## by virtue of only looking up each function 1x.
+    ## NOTE this assumes that tag_list has no '' values
+    col_coord = [unique_tags.index(tag_sub) for 
+                 tag_group in tag_list for 
+                 tag_sub in tag_group]
+
+    row_coord = [[i] * len(tag_list[i]) for i in range(len(tag_list))]
+
+    cell_value = [1] * len(col_coord)
+
+    col_dim = len(unique_tags)
+    row_dim = len(tag_list)
 
         # for tag in tag_group:
         #     if tag != '':
@@ -111,14 +130,18 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
                          shape=(row_dim, col_dim)
                          )
 
-    list_out = [unique_tags, mat_out]
-    return(list_out)
+    dict_out = {'row_idx': tag_idx,
+                'unique_tags': unique_tags, 
+                'tag_matrix': mat_out
+                }
+    return(dict_out)
 
 
-## Generate the sparse matrix
+## Generate the sparse matrix and associated values
+
+## Define the input values for the regexp
 to_delete = "^[<]{1}|[>]{1}$"
 to_split = "><"
-filename = '../data/sparse_tag_matrix'
 
 print 'Data loaded, initiating function'
 tag_object = generate_sparse_tag_matrix(tag_vec = tag_data, 
@@ -129,6 +152,7 @@ tag_object = generate_sparse_tag_matrix(tag_vec = tag_data,
 print 'Function done, writing out'
 ## Write the file out
 ## Pickle dump here or similar
+filename = '../data/sparse_tag_matrix.pickle'
 with open(filename, 'wt') as f:
     pickle.dump(tag_object, f)
 
