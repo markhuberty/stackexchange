@@ -135,8 +135,6 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
     print (col_dim)
     print(row_dim)
 
-    print(len(row_coord))
-    print(len(col_coord))
                 
     print 'Indices written, generating sparse matrix'
     gc.enable()
