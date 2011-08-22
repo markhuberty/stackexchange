@@ -65,14 +65,23 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
     ## as in <tag1><tag2><tag3> -> [tag1, tag2, tag3]
     ## Write out a set of parsed tags for each row,
     ## a vector of all tags, and a list of row indices
-    for tag in tag_vec:
-        if tag[0] != '':
-            tag_temp = p_delete.sub("", tag[0])
-            tag_split = p_split.split(tag_temp)
-            tag_list.append(tag_split)
-            all_tags.extend(tag_split)
-            this_idx = [tag_vec.index(tag)]
-            tag_idx.extend(this_idx)
+    # for tag in tag_vec:
+    #     if tag[0] != '':
+    #         tag_temp = p_delete.sub("", tag[0])
+    #         tag_split = p_split.split(tag_temp)
+    #         tag_list.append(tag_split)
+    #         all_tags.extend(tag_split)
+    #         this_idx = [tag_vec.index(tag)]
+    #         tag_idx.extend(this_idx)
+
+    tag_temp = [p_delete.sub("", tag[0]) for tag in tag_vec]
+    tag_list = [p_split.split(tag) for tag in tag_temp]
+    
+    all_tags = []
+    for tag in tag_list:
+        all_tags.extend(tag)
+        
+    tag_idx = [tag_vec.index(tag) for tag in tag_vec]
 
     ## Generate a list of unique tags
     unique_tags = uniquify(seq = all_tags)
