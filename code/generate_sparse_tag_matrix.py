@@ -145,8 +145,7 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
     ## Declare and populate the sparse matrix
     row_coord = array( row_coord )
     col_coord = array( col_coord )
-    mat_out = csc_matrix(array(cell_value),
-                         (row_coord, col_coord),
+    mat_out = csc_matrix((array(cell_value), (row_coord, col_coord)),
                          shape=(row_dim, col_dim)
                          )
 
