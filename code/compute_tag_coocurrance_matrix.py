@@ -73,8 +73,8 @@ edges = [(unique_tags[r], unique_tags[c], tag_matrix_multiply[r,c])
 g_tag.add_weighted_edges_from(edges)    
 
 
-g_tag_pos = nx.draw_spring(g_tag)
-plt.savefig('../figures/tag_association_tree.png')
+# g_tag_pos = nx.draw_spring(g_tag)
+# plt.savefig('../figures/tag_association_tree.png')
 
 
 ## And generate the MST w/ Kruskal's alg
