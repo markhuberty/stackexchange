@@ -71,7 +71,7 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
             tag_split = p_split.split(tag_temp)
             tag_list.append(tag_split)
             all_tags.extend(tag_split)
-            tag_idx.extend(tag_vec.index(tag))
+            tag_idx.extend(tag_vec.index(tag_split))
 
     ## Generate a list of unique tags
     unique_tags = uniquify(seq = all_tags)
