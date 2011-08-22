@@ -132,13 +132,19 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
         #         row_coord.append(tag_list.index(tag_group))
         #         col_coord.append(unique_tags.index(tag))
         #         cell_value.append(1)
-                
+    print (col_dim)
+    print(row_dim)
+
+    print(len(row_coord))
+    print(len(col_coord))
                 
     print 'Indices written, generating sparse matrix'
     gc.enable()
     ## Declare and populate the sparse matrix
+    row_coord = array( row_coord )
+    col_coord = array( col_coord )
     mat_out = csc_matrix(array(cell_value),
-                         (array(row_coord), array(col_coord)),
+                         (row_coord, col_coord),
                          shape=(row_dim, col_dim)
                          )
 
