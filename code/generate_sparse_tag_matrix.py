@@ -122,6 +122,9 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
     print 'Writing row coords'
     row_coord = [[i] * len(tag_list[i]) for i in range(len(tag_list))]
 
+    print col_coord[0:5]
+    print row_coord[0:5]
+
     cell_value = [1] * len(col_coord)
 
     col_dim = len(unique_tags)
