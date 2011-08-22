@@ -54,9 +54,9 @@ def uniquify(seq, idfun=None):
 ## one for each entry in the vector, and then writes the result
 ## to a sparse matrix of dimension ROWS * COUNT(unique_tags)
 def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
-    tag_list = []
-    all_tags = []
-    tag_idx = []
+    # tag_list = []
+    # all_tags = []
+    # tag_idx = []
 
     p_delete = re.compile(to_delete)
     p_split = re.compile(to_split)
@@ -81,7 +81,7 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
     for tag in tag_list:
         all_tags.extend(tag)
         
-    tag_idx = [tag_vec.index(tag) for tag in tag_vec]
+    #tag_idx = [tag_vec.index(tag) for tag in tag_vec]
 
     ## Generate a list of unique tags
     unique_tags = uniquify(seq = all_tags)
@@ -142,7 +142,7 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
                          shape=(row_dim, col_dim)
                          )
 
-    dict_out = {'row_idx': tag_idx,
+    dict_out = {#'row_idx': tag_idx,
                 'unique_tags': unique_tags, 
                 'tag_matrix': mat_out
                 }
