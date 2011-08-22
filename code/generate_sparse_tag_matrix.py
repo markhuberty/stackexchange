@@ -104,10 +104,12 @@ def generate_sparse_tag_matrix(tag_vec, to_delete, to_split):
     ## Alt method w/ list comprehensions; might be faster 
     ## by virtue of only looking up each function 1x.
     ## NOTE this assumes that tag_list has no '' values
+    print 'Writing col coords'
     col_coord = [unique_tags.index(tag_sub) for 
                  tag_group in tag_list for 
                  tag_sub in tag_group]
 
+    print 'Writing row coords'
     row_coord = [[i] * len(tag_list[i]) for i in range(len(tag_list))]
 
     cell_value = [1] * len(col_coord)
