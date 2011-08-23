@@ -36,7 +36,6 @@ tag_matrix_multiply = tag_matrix_multiply.asfptype()
 
 tag_frequency_np = tag_matrix_transpose.sum(axis=1)
 
-tag_matrix_multiply = triu(tag_matrix_multiply).tocsc()
 
 ## Divide out the colsums to get the conditional probability of 
 ## co-incidence
@@ -61,7 +60,7 @@ top_tags = tags[1:1000]
 tag_indices = [unique_tags.index(tag) for tag in top_tags]
 
 ## Create the nx graph and add the top tags as nodes
-g_tag = nx.Graph()
+g_tag = nx.DiGraph()
 
 ## Then add the edges as weights
 ## Get values below threshold
@@ -79,11 +78,9 @@ g_tag.add_weighted_edges_from(edges)
 
 
 ## And generate the MST w/ Kruskal's alg
-mst = list(nx.minimum_spanning_tree(g_tag))
-mst_graph = nx.Graph()
-mst_graph.add_weighted_edges_from(mst)
+mst = nx.minimum_spanning_tree(g_tag_test)
 
-mst_graph_pos = nx.draw_spring(mst_graph)
+mst_graph_pos = nx.draw_spring(mst)
 plt.savefig('../figures/tag_association_mst.png')
 
 
