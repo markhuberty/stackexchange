@@ -86,10 +86,10 @@ g_tag_test.add_weighted_edges_from(edges)
 mst = nx.minimum_spanning_tree(g_tag_test)
 
 mst_graph_pos = nx.draw_spring(mst,
-                               with_labels=True,
+                               with_labels=False,
                                alpha=0.7,
                                font_size=4,
-                               node_size=50
+                               node_size=20
                                )
 plt.savefig('../figures/tag_association_mst.png')
 
