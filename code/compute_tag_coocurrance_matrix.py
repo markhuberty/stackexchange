@@ -65,7 +65,7 @@ g_tag = nx.DiGraph()
 ## Then add the edges as weights
 ## Get values below threshold
 threshold = 0.7
-edges = [(unique_tags[r], unique_tags[c], tag_matrix_multiply[r,c])
+edges = [(unique_tags[r], unique_tags[c], 1-tag_matrix_multiply[r,c])
          for r, c in zip(row_indices, col_indices) 
          if tag_matrix_multiply[r,c] >= threshold
          ]
