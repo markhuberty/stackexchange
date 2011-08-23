@@ -85,13 +85,16 @@ g_tag_test.add_weighted_edges_from(edges)
 ## And generate the MST w/ Kruskal's alg
 mst = nx.minimum_spanning_tree(g_tag_test)
 
-mst_graph_pos = nx.draw_spring(mst,
-                               with_labels=False,
-                               alpha=0.7,
-                               font_size=4,
-                               node_size=20
-                               )
+mst_graph_pos = nx.draw_graphviz(mst,
+                                 prog='neato',
+                                 with_labels=False,
+                                 alpha=0.7,
+                                 font_size=4,
+                                 node_size=10
+                                 )
 plt.savefig('../figures/tag_association_mst.png')
-
+## Right now, this plots but is really very messed up
+## Need to use graphviz instead to get the plotting right. 
+## NEATO layout should work better
 
 
