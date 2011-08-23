@@ -90,9 +90,9 @@ mst_graph_pos = nx.draw_graphviz(mst,
                                  with_labels=False,
                                  alpha=0.7,
                                  font_size=4,
-                                 node_size=10
+                                 node_size=5
                                  )
-plt.savefig('../figures/tag_association_mst.png')
+plt.savefig('../figures/tag_association_mst.pdf')
 ## Right now, this plots but is really very messed up
 ## Need to use graphviz instead to get the plotting right. 
 ## NEATO layout should work better
