@@ -78,7 +78,7 @@ g_tag.add_weighted_edges_from(edges)
 
 
 ## And generate the MST w/ Kruskal's alg
-mst = nx.mst(g_tag)
+mst = nx.kruskal_mst(g_tag)
 mst_graph = nx.DiGraph()
 mst_graph.add_weighted_edges_from(mst)
 
