@@ -62,6 +62,7 @@ tag_indices = [unique_tags.index(tag) for tag in top_tags]
 
 ## Create the nx graph and add the top tags as nodes
 g_tag = nx.DiGraph()
+g_tag_test = nx.Graph()
 
 ## Then add the edges as weights
 ## Get values below threshold
@@ -72,14 +73,14 @@ edges = [(unique_tags[r], unique_tags[c], 1-tag_matrix_multiply[r,c])
          ]
 
 g_tag.add_weighted_edges_from(edges)    
-
+g_tag_test.add_weighted_edges_from(edges)
 
 # g_tag_pos = nx.draw_spring(g_tag)
 # plt.savefig('../figures/tag_association_tree.png')
 
 
 ## And generate the MST w/ Kruskal's alg
-mst = nx.minimum_spanning_tree(g_tag)
+mst = nx.minimum_spanning_tree(g_tag_test)
 
 mst_graph_pos = nx.draw_spring(mst)
 plt.savefig('../figures/tag_association_mst.png')
