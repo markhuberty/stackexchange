@@ -85,7 +85,12 @@ g_tag_test.add_weighted_edges_from(edges)
 ## And generate the MST w/ Kruskal's alg
 mst = nx.minimum_spanning_tree(g_tag_test)
 
-mst_graph_pos = nx.draw_spring(mst)
+mst_graph_pos = nx.draw_spring(mst,
+                               with_labels=True,
+                               alpha=0.7,
+                               font_size=4,
+                               node_size=50
+                               )
 plt.savefig('../figures/tag_association_mst.png')
 
 
