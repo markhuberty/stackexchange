@@ -9,8 +9,9 @@ import matplotlib.pyplot as plt
 ## Load the sparse matrix of COUNT(posts) * COUNT(unique tags)
 filename = "../data/sparse_tag_matrix.pickle"
 
-with open(filename, 'rb') as f:
-    tag_object = pickle.load(f) 
+f = open(filename, 'rb')
+
+tag_object = pickle.load(f) 
 
 f.close()
 
