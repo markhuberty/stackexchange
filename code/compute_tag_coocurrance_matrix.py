@@ -36,7 +36,7 @@ tag_matrix_multiply = tag_matrix_multiply.asfptype()
 
 tag_frequency_np = tag_matrix_transpose.sum(axis=1)
 
-tag_matrix_multiply = triu(tag_matrix_multiply)
+tag_matrix_multiply = triu(tag_matrix_multiply).tocsc()
 
 ## Divide out the colsums to get the conditional probability of 
 ## co-incidence
