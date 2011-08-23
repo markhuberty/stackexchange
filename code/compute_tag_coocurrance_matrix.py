@@ -5,6 +5,7 @@ import networkx as nx
 import os
 import pickle
 import matplotlib.pyplot as plt
+matplotlib.use('Agg')
 
 ## Load the sparse matrix of COUNT(posts) * COUNT(unique tags)
 filename = "../data/sparse_tag_matrix.pickle"
