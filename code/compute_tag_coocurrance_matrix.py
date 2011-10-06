@@ -43,7 +43,13 @@ tag_matrix_multiply = tag_matrix_multiply.asfptype()
 
 tag_frequency_np = tag_matrix_transpose.sum(axis=1)
 
+size = tag_matrix_multiply.get_shape()
+sparseness = len(tag_matrix_multiply.data) / (size[1] * size[0])
 
+print 'size'
+print size
+print 'sparseness'
+print sparseness
 ## Divide out the colsums to get the conditional probability of 
 ## co-incidence
 row_indices, col_indices = tag_matrix_multiply.nonzero()
