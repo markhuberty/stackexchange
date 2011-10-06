@@ -5,7 +5,7 @@ import networkx as nx
 import os
 import pickle
 import matplotlib as mpl
-mpl.use('Agg')
+mpl.use('Agg') ## Allows mpl to function w/o active X session
 import matplotlib.pyplot as plt
 
 
@@ -25,9 +25,12 @@ f.close()
 unique_tags = tag_object['unique_tags']
 tag_matrix = tag_object['tag_matrix']
 
+## Calculate absolute term occurrance freq. as column sum of the 
+## post-term matrix
 tag_frequency = [tag_matrix[:,j].sum() for j in range(tag_matrix.get_shape()[1])]
 
 tag_frequency = list(tag_frequency)
+## The pct frequency is (# of occurrances) / (total posts)
 tag_frequency_pct = [float(freq) / tag_matrix.get_shape()[0] for freq in 
                      tag_frequency]
 
@@ -36,7 +39,7 @@ tag_frequency_pct = [float(freq) / tag_matrix.get_shape()[0] for freq in
 ## where the cells are counts of co-occurance between tags
 tag_matrix_transpose = tag_matrix.transpose()
 tag_matrix_multiply = tag_matrix_transpose * tag_matrix
-tag_matrix_multiply = tag_matrix_multiply.asfptype()
+tag_matrix_multiply = tag_matrix_multiply.asfptype() 
 
 tag_frequency_np = tag_matrix_transpose.sum(axis=1)
 
@@ -48,7 +51,8 @@ tag_frequencies = tag_frequency_np[col_indices]
 
 for d in range(len(tag_matrix_multiply.data)):
     tag_matrix_multiply.data[d] = tag_matrix_multiply.data[d] / tag_frequencies[d]
-                                        
+                                    
+print 'Done with the proximity calculation'    
 filename = '../data/tag_proximity_matrix_full.pickle'
 with open(filename, 'wt') as f:
     pickle.dump(tag_matrix_multiply, f)
