@@ -27,53 +27,85 @@
 
 ("sec:inst-skill-devel" "s" "Theories of comparative political economy predict that institutional variation in the advanced indus" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
 
-(toc "toc" "    3 Data" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "3" "\\section{Data}" 3959)
+(toc "toc" "    3 Pursuing new data for measurement" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "3" "\\section{Pursuing new data for measurement}" 3959)
 
 ("sec:data" "s" "I exploit a new dataset on technology adoption and skill formation in the information technology ind" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
 
 ("fig:stack-question-answer" "f" "Sample StackOverflow question and answer" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
 
-(toc "toc" "    4 Research Design" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "4" "\\section{Research Design}" 8141)
+(toc "toc" "      3.1 Other data needed" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 3 "3.1" "\\subsection{Other data needed}" 8115)
+
+("sec:other-data-needed" "s" nil "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil "")
+
+(toc "toc" "      3.1  " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 3 "3.1" "\\subsection{}" 8115)
+
+(toc "toc" "    4 Research Design" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "4" "\\section{Research Design}" 8517)
 
 ("sec:research-design" "s" "To employ the StackOverflow data in the study of skill and task specificity, we first need to define" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
 
-(toc "toc" "      4.1 Definitions" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 3 "4.1" "\\subsection{Definitions}" 8387)
+(toc "toc" "      4.1 Definitions" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 3 "4.1" "\\subsection{Definitions}" 8763)
 
 ("sec:definitions" "s" "\\subsubsection{Skill specificity}  \\textbf{Skills} will refer to knowledge of the workings of specif" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
 
-(toc "toc" "        4.1.1 Skill specificity" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 4 "4.1.1" "\\subsubsection{Skill specificity}" 8437)
+(toc "toc" "        4.1.1 Skill specificity" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 4 "4.1.1" "\\subsubsection{Skill specificity}" 8813)
 
 ("sec:skill-specificity" "s" "\\textbf{Skills} will refer to knowledge of the workings of specific technologies, such as the $C$ or" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
 
-("eq:1" "e" "\\frac{\\sum_{q \\in Q} T_i \\in T_q | T_j \\in T_q}{\\sum_{q \\in Q} T_i \\in T_q} " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+("eq:1" "e" "p_{i,j} = \\frac{\\sum_{q \\in Q} T_i \\in T_q | T_j \\in T_q}{\\sum_{q \\in Q} T_j \\in T_q} " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
 
-(toc "toc" "        4.1.2 Task specificity" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 4 "4.1.2" "\\subsubsection{Task specificity}" 10336)
+(toc "toc" "        4.1.2 Task proximity" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 4 "4.1.2" "\\subsubsection{Task proximity}" 10712)
 
 ("sec:task-specificity" "s" "\\textbf{Tasks} will refer to the application of technologies. Consistent with the definition in equa" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
 
-("eq:2" "e" "\\frac{\\sum_{q \\in Q} K_i \\in K_q | K_j \\in K_q}{\\sum_{q \\in Q} K_i \\in K_q} " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+("eq:2" "e" "\\frac{\\sum_{q \\in Q} K_i \\in K_q | K_j \\in K_q}{\\sum_{q \\in Q} K_j \\in K_q} " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
 
-(toc "toc" "        4.1.3 From proximity to specificity" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 4 "4.1.3" "\\subsubsection{From proximity to specificity}" 11465)
+(toc "toc" "        4.1.3 From proximity to specificity" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 4 "4.1.3" "\\subsubsection{From proximity to specificity}" 11841)
 
 ("sec:from-prox-spec" "s" "Scoring tasks or skills as more or less specific requires that we translate from proximity between p" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
 
-("eq:3" "e" "S_i = \\sum_{q \\in Q} p_{i,q} > \\delta " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+("eq:3" "e" "ST_i = \\sum_{q \\in Q} p_{i,q} > \\delta " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
 
-(toc "toc" "        4.1.4 Individual-level skill and task specialization" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 4 "4.1.4" "\\subsubsection{Individual-level skill and task specialization}" 12891)
+(toc "toc" "        4.1.4 Task specificity and technological clustering" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 4 "4.1.4" "\\subsubsection{Task specificity and technological clustering}" 12638)
 
-("sec:indiv-level-skill" "s" nil "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil "")
+("sec:task-spec-techn" "s" "Observers will note that some technologies (skills) are heirarchical. For instance, the \\texttt{bash" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
 
-("tab:discrete-skill-task" "t" nil "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil "")
+(toc "toc" "        4.1.5 Individual-level skill and task specialization" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 4 "4.1.5" "\\subsubsection{Individual-level skill and task specialization}" 13993)
 
-(toc "toc" "    5 Results" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "5" "\\section{Results}" 13731)
+("sec:indiv-level-skill" "s" "Given these definitions of task and skill specificity, we can now define what we mean by those terms" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+
+(toc "toc" "      4.2 Technical design" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 3 "4.2" "\\subsection{Technical design}" 15087)
+
+("sec:technical-design" "s" "\\subsubsection{Option 1: continuous measures of tasks and skills}  \\begin{enumerate} " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+
+(toc "toc" "        4.2.1 Option 1: continuous measures of tasks and skills" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 4 "4.2.1" "\\subsubsection{Option 1: continuous measures of tasks and skills}" 15147)
+
+("sec:option-1:-continuous" "s" "\\begin{enumerate} " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+
+(toc "toc" "        4.2.2 Option 2: clusters of tags" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 4 "4.2.2" "\\subsubsection{Option 2: clusters of tags}" 16325)
+
+("sec:option-2:-clusters" "s" "\\begin{enumerate} " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+
+(toc "toc" "    5 Hypotheses" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "5" "\\section{Hypotheses}" 17097)
+
+("sec:hypotheses" "s" "\\subsection{Approach 1: continuous measures}  \\begin{description} " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+
+(toc "toc" "      5.1 Approach 1: continuous measures" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 3 "5.1" "\\subsection{Approach 1: continuous measures}" 17142)
+
+("sec:appr-1:-cont" "s" "\\begin{description} " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+
+(toc "toc" "      5.2 Approach 2: clustered measures" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 3 "5.2" "\\subsection{Approach 2: clustered measures}" 17596)
+
+("sec:appr-2:-clust" "s" "\\begin{description} " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
+
+(toc "toc" "    6 Results" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "6" "\\section{Results}" 18140)
 
 ("sec:results" "s" "\\section{Discussion}  \\section{Conclusions} \\label{sec:conclusions} \\FloatBarrier \\bibliography{/bib" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
 
-(toc "toc" "    6 Discussion" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "6" "\\section{Discussion}" 13770)
+(toc "toc" "    7 Discussion" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "7" "\\section{Discussion}" 18179)
 
 ("sec:discussion" "s" "\\section{Conclusions}  \\FloatBarrier \\bibliography{/bibs/VOC_Bib} \\bibliographystyle{apalike} " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
 
-(toc "toc" "    7 Conclusions" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "7" "\\section{Conclusions}" 13815)
+(toc "toc" "    8 Conclusions" "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil 2 "8" "\\section{Conclusions}" 18224)
 
 ("sec:conclusions" "s" "\\FloatBarrier \\bibliography{/bibs/VOC_Bib} \\bibliographystyle{apalike} " "/Users/markhuberty/Documents/Research/Papers/stackexchange/paper/stackexchange.tex" nil)
 
