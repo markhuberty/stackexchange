@@ -13,6 +13,10 @@ library(stringr)
 library(Hmisc)
 library(gdata)
 
+title.wrapper <- wrapper <- function(x, ...){
+  paste(strwrap(x, ...), collapse = "\n")
+}
+
 geocoded.locations <- read.csv("./data/location_geocoded_final.csv",
                                header=TRUE
                                )
@@ -135,15 +139,6 @@ user.country.counts$country.code <-
 user.country.counts$log.user.pc <- log(user.country.counts$user.pc)
 
 
-plot.user.freq <- ggplot(users.df.new,
-                         aes(x=country.code)
-                         ) +
-  geom_bar()
-
-pdf("./figures/plot_user_freq.pdf")
-print(plot.user.freq)
-dev.off()
-
 country.sub <- c("AU",
                  "US",
                  "GB",
@@ -199,8 +194,10 @@ plot.user.freq.pc <-
                                        )
                                    ) +
   geom_point() +
-  scale_y_continuous() + 
-  opts(axis.text.x=theme_text(size=4)) 
+  scale_y_continuous("Log users per capita") +
+  scale_x_discrete("Country") + 
+  opts(title=title.wrapper("Per-capita users by country", width=80),
+       axis.text.x=theme_text(size=4)) 
 
 pdf("./figures/plot_user_freq_pc.pdf")
 print(plot.user.freq.pc)
@@ -235,17 +232,25 @@ plot.user.access.date <- ggplot(users.df.new.sub,
                                 aes(x=LastAccessDate)
                                 ) +
   geom_density(aes(group=country.code)) +
-  geom_density(colour="red")
+  geom_density(colour="red") +
+  scale_y_continuous("Density") +
+  scale_x_date("User last access date") +
+  opts(title=title.wrapper("PDF of user last access date for each country (black) and whole population (red)", width=80)
+       )
+
+plot.user.creation.date <- ggplot(users.df.new.sub,
+                                  aes(x=CreationDate)
+                                  ) +
+  geom_density(aes(group=country.code)) +
+  geom_density(colour="red") +
+  scale_y_continuous("Density") +
+  scale_x_date("User creation date") +
+  opts(title=title.wrapper("PDF of user creation date for each country (black) and whole population (red)", width=80)
+       )
 
 pdf("./figures/plot_user_access_date_density.pdf")
 print(plot.user.access.date)
 dev.off()
-
-plot.user.creation.date <- ggplot(users.df.new.sub,
-                                aes(x=CreationDate)
-                                ) +
-  geom_density(aes(group=country.code)) +
-  geom_density(colour="red")
 
 pdf("./figures/plot_user_creation_date_density.pdf")
 print(plot.user.creation.date)
@@ -270,7 +275,11 @@ plot.user.rep <- ggplot(users.df.new.sub,
                             )
                         ) +
   geom_density(aes(group=country.code)) +
-  geom_density(colour="red")
+  geom_density(colour="red") +
+  scale_y_continuous("Density") +
+  scale_x_continuous("log(Reputation)") +
+  opts(title=title.wrapper("PDF of user reputation for each country (black) and whole population (red)", width=80)
+       )
 
 pdf("./figures/plot_user_rep.pdf")
 print(plot.user.rep)
@@ -334,21 +343,26 @@ compute.overall.ks <- function(variable, factor){
 
 ## Test each distribution against all others to determine
 ## exchangeability among pairwise countries
-test <- compute.pairwise.ks(users.df.new.sub$Reputation,
-                            users.df.new.sub$country.code
-                            )
-test <- test[test$i.vec != test$j.vec,]
-test$out <- round(test$out, 4)
-test$sig.p <- test$out < 0.1
+ks.test.user.rep <- compute.pairwise.ks(users.df.new.sub$Reputation,
+                                        users.df.new.sub$country.code
+                                        )
+ks.test.user.rep <- ks.test.user.rep[ks.test.user.rep$i.vec !=
+                                     ks.test.user.rep$j.vec,
+                                     ]
+ks.test.user.rep$out <- round(ks.test.user.rep$out, 4)
+ks.test.user.rep$sig.p <- ks.test.user.rep$out < 0.1
 
-plot.pairwise.ks <- ggplot(test,
+plot.pairwise.ks <- ggplot(ks.test.user.rep,
                            aes(x=i.vec,
                                y=j.vec,
                                fill=sig.p
                                )
                            ) +
   geom_tile() +
-  opts(axis.text.x=theme_text(size=6),
+  scale_x_discrete("Country") +
+  scale_y_discrete("Country") +
+  opts(title=title.wrapper("Pairwise significance of difference in user reputation distribution", width=80),
+       axis.text.x=theme_text(size=6),
        axis.text.y=theme_text(size=6)
        )
 
@@ -358,27 +372,27 @@ dev.off()
 
 ## Test each distribution against the overall distribution
 ## to determine if they are exchangeable
-test.all <- compute.overall.ks(users.df.new.sub$Reputation,
-                               users.df.new.sub$country.code
-                               )
+ks.test.user.rep.overall <- compute.overall.ks(users.df.new.sub$Reputation,
+                                               users.df.new.sub$country.code
+                                               )
 
 ## Reorder the countries by the p-values
-test.all$i.vec <- factor(test.all$i.vec,
-                         levels=levels(test.all$i.vec)[order(test.all$out)]
-                         )
+ks.test.user.rep.overall$i.vec <- factor(ks.test.user.rep.overall$i.vec,
+                                         levels=levels(ks.test.user.rep.overall$i.vec)[order(ks.test.user.rep.overall$out)]
+                                         )
 
 ## Merge in the other by-country summary data
-test.all <- merge(test.all,
-                  user.country.counts.sub,
-                  by.x="i.vec",
-                  by.y="country.code",
-                  all.x=TRUE,
-                  all.y=FALSE
-                  )
+ks.test.user.rep.overall <- merge(ks.test.user.rep.overall,
+                                  user.country.counts.sub,
+                                  by.x="i.vec",
+                                  by.y="country.code",
+                                  all.x=TRUE,
+                                  all.y=FALSE
+                                  )
 
 ## Plot the p-values by country, showing user count
 ## and mean user repuration by country as well
-plot.all.ks <- ggplot(test.all,
+plot.all.ks <- ggplot(ks.test.user.rep.overall,
                       aes(x=i.vec,
                           y=out,
                           size=log10(user.count),
@@ -387,13 +401,19 @@ plot.all.ks <- ggplot(test.all,
                       ) +
   geom_point() +
   geom_hline(aes(yintercept=0.1), colour="red", legend=FALSE) +
-  opts(axis.text.x=theme_text(size=6))
+  scale_x_discrete("Country") +
+  scale_y_continuous("P-value (10% level in red)") + 
+  opts(title=title.wrapper("KS-test p-values, country user reputation distribution versus all users", width=80),
+       axis.text.x=theme_text(size=6)
+       ) +
+  scale_size("Log user count") +
+  scale_colour_gradient("Mean user reputation")
 
 pdf("./figures/plot_all_ks_reputation_test.pdf")
 print(plot.all.ks)
 dev.off()
 
-
+## Test differences in the distribution of access and creation date
 ks.test.creation.date <-
   compute.overall.ks(as.integer(users.df.new.sub$CreationDate),
                      users.df.new.sub$country.code
@@ -406,19 +426,25 @@ ks.test.creation.date <- merge(ks.test.creation.date,
                                all.y=FALSE
                                )
 
-plot.all.ks <- ggplot(ks.test.creation.date,
-                      aes(x=i.vec,
-                          y=out,
-                          size=log10(user.count),
-                          colour=user.mean.rep
-                          )
-                      ) +
+plot.ks.creation.date <- ggplot(ks.test.creation.date,
+                                aes(x=i.vec,
+                                    y=out,
+                                    size=log10(user.count),
+                                    colour=user.mean.rep
+                                    )
+                                ) +
   geom_point() +
   geom_hline(aes(yintercept=0.1), colour="red", legend=FALSE) +
-  opts(axis.text.x=theme_text(size=6))
+  scale_x_discrete("Country") +
+  scale_y_continuous("P-value (10% level in red)") +
+  scale_size("Log user count") +
+  scale_colour_gradient("Mean user reputation") + 
+  opts(title=title.wrapper("KS-test p-values, country user creation date distribution versus all users", width=80),
+       axis.text.x=theme_text(size=6)
+       )
 
 pdf("./figures/plot_ks_creation_date_test.pdf")
-print(plot.all.ks)
+print(plot.ks.creation.date)
 dev.off()
 
 
@@ -443,7 +469,10 @@ plot.all.ks <- ggplot(ks.test.access.date,
                       ) +
   geom_point() +
   geom_hline(aes(yintercept=0.1), colour="red", legend=FALSE) +
-  opts(axis.text.x=theme_text(size=6))
+  scale_x_discrete("Country") +
+  scale_y_continuous("P-value (10% level in red)") + 
+  opts(title=title.wrapper("KS-test p-values, country user last access date distribution versus all users"),
+       axis.text.x=theme_text(size=6))
 
 pdf("./figures/plot_ks_access_date_test.pdf")
 print(plot.all.ks)
@@ -467,9 +496,12 @@ plot.mean.reputation <- ggplot(users.df.new.sub,
                                ) +
   stat_summary(fun.y="mean", geom="point", colour="black") + 
   stat_summary(fun.data="mean_cl_boot", geom="linerange", colour="red") +
+  scale_x_discrete("Country") + 
+  scale_y_continuous("User reputation") +
   coord_cartesian(ylim=c(0,2000)) +
-  scale_y_continuous() +
-  opts(axis.text.x=theme_text(size=5))
+  opts(title=title.wrapper("Mean user reputation and variance by country", width=80),
+       axis.text.x=theme_text(size=5)
+       )
 
 pdf("./figures/plot_mean_reputation.pdf")
 print(plot.mean.reputation)

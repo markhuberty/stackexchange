@@ -107,4 +107,10 @@ plt.savefig('../figures/tag_association_mst.pdf')
 ## Need to use graphviz instead to get the plotting right. 
 ## NEATO layout should work better
 
+g_tag
+        
+        
+
+            
+
 
