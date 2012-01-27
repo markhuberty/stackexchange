@@ -8,7 +8,7 @@ import matplotlib as mpl
 mpl.use('Agg') ## Allows mpl to function w/o active X session
 import matplotlib.pyplot as plt
 
-
+os.chdir('/home/markhuberty/Documents/stackexchange/code/')
 ## Load the sparse matrix of COUNT(posts) * COUNT(unique tags)
 filename = "../data/sparse_tag_matrix.pickle"
 
@@ -79,7 +79,7 @@ g_tag_test = nx.Graph()
 
 ## Then add the edges as weights
 ## Get values below threshold
-threshold = 0.7
+threshold = 0.0
 edges = [(unique_tags[r], unique_tags[c], 1-tag_matrix_multiply[r,c])
          for r, c in zip(row_indices, col_indices) 
          if tag_matrix_multiply[r,c] >= threshold
@@ -96,7 +96,7 @@ g_tag_test.add_weighted_edges_from(edges)
 mst = nx.minimum_spanning_tree(g_tag_test)
 
 mst_graph_pos = nx.draw_graphviz(mst,
-                                 prog='neato',
+                                 prog='fdp', ## Doesn't render full graph
                                  with_labels=False,
                                  alpha=0.7,
                                  font_size=4,
@@ -107,7 +107,6 @@ plt.savefig('../figures/tag_association_mst.pdf')
 ## Need to use graphviz instead to get the plotting right. 
 ## NEATO layout should work better
 
-g_tag
         
         
 

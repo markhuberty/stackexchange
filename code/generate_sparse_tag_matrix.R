@@ -19,6 +19,7 @@ db = "stackoverflow"
 parse.tag.list <- FALSE
 if(parse.tag.list)
   {
+    ptm <- proc.time()
     conn <- dbConnect("MySQL",
                       username = username,
                       password = password,
@@ -29,7 +30,8 @@ if(parse.tag.list)
     tags <- fetch(tag.query, -1)
 
     dbDisconnect(conn)
-
+    proc.time()  - ptm
+    
 
     tags.vec <- as.character(tags[,1])
     rm(tags)
