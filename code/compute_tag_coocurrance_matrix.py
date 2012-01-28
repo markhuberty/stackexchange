@@ -5,7 +5,7 @@ import networkx as nx
 import os
 import pickle
 import matplotlib as mpl
-mpl.use('Agg') ## Allows mpl to function w/o active X session
+#mpl.use('Agg') ## Allows mpl to function w/o active X session
 import matplotlib.pyplot as plt
 
 os.chdir('/home/markhuberty/Documents/stackexchange/code/')
@@ -27,82 +27,118 @@ tag_matrix = tag_object['tag_matrix']
 
 ## Calculate absolute term occurrance freq. as column sum of the 
 ## post-term matrix
-tag_frequency = [tag_matrix[:,j].sum() for j in range(tag_matrix.get_shape()[1])]
+tag_frequency = tag_matrix.sum(axis=0)
+tag_frequency = [tag_frequency[0,i] for i in range(tag_frequency.shape[1])]
+tag_frequency = np.array(tag_frequency)
 
-tag_frequency = list(tag_frequency)
-## The pct frequency is (# of occurrances) / (total posts)
-tag_frequency_pct = [float(freq) / tag_matrix.get_shape()[0] for freq in 
-                     tag_frequency]
-
-
+## Take only the top tags based on median tag counts
+bool_top_tags = tag_frequency >= tag_frequency.mean()
+idx_top_tags = [i for i,b in enumerate(bool_top_tags) if b]
+tag_matrix = tag_matrix[:,idx_top_tags]
+unique_tags = [unique_tags[i] for i in idx_top_tags]
+tag_frequency = [tag_frequency[i] for i in idx_top_tags]
+## Generate the co-occurrance matrix
 ## Multiply. This should return a count(tags) * count(tags) matrix
 ## where the cells are counts of co-occurance between tags
-tag_matrix_transpose = tag_matrix.transpose()
-tag_matrix_multiply = tag_matrix_transpose * tag_matrix
+tag_matrix_multiply = tag_matrix.transpose() * tag_matrix
 tag_matrix_multiply = tag_matrix_multiply.asfptype() 
 
-tag_frequency_np = tag_matrix_transpose.sum(axis=1)
 
-size = tag_matrix_multiply.get_shape()
-sparseness = float(len(tag_matrix_multiply.data)) / (size[1] * size[0])
-
-print 'size'
-print size
-print 'sparseness'
-print sparseness
 ## Divide out the colsums to get the conditional probability of 
 ## co-incidence
 row_indices, col_indices = tag_matrix_multiply.nonzero()
-tag_frequencies = tag_frequency_np[col_indices]
+tag_frequencies = [tag_frequency[i] for i in col_indices]
+
+
+to_keep = [idx for idx, r in enumerate(row_indices) if row_indices[idx] != col_indices[idx]]
+row_indices = [row_indices[idx] for idx in to_keep]
+col_indices = [col_indices[idx] for idx in to_keep]
+
 
 for d in range(len(tag_matrix_multiply.data)):
     tag_matrix_multiply.data[d] = tag_matrix_multiply.data[d] / tag_frequencies[d]
+
                                     
 print 'Done with the proximity calculation'    
-filename = '../data/tag_proximity_matrix_full.pickle'
+
+filename='../data/tag_proximity_csc.pickle'
 with open(filename, 'wt') as f:
     pickle.dump(tag_matrix_multiply, f)
 
-## Then render the matrix much smaller by dumping nodes not in 
-## the top 1000 tags
-
-tags_freqs = zip(tag_frequency, unique_tags)
-tags_freqs.sort(reverse = True)
-freqs, tags = zip(*tags_freqs)
-
-top_tags = tags[1:1000]
-tag_indices = [unique_tags.index(tag) for tag in top_tags]
+## Way too slow...
+# ## Now take the pairwise minima
+# prox_minima = []
+# for i in range(len(unique_tags)):
+#     for j in range(i+1, len(unique_tags)):
+#         if i is not j:
+#             val_a = tag_matrix_multiply[i,j]
+#             val_b = tag_matrix_multiply[j,i]
+#             if val_a > val_b:
+#                 prox_minima.append((i,j, val_b))
+#             else:
+#                 prox_minima.append((j,i, val_a))
+    
 
 ## Create the nx graph and add the top tags as nodes
-g_tag = nx.DiGraph()
-g_tag_test = nx.Graph()
+g_tag = nx.Graph()
 
 ## Then add the edges as weights
 ## Get values below threshold
 threshold = 0.0
 edges = [(unique_tags[r], unique_tags[c], 1-tag_matrix_multiply[r,c])
+         if tag_matrix_multiply[r,c] < tag_matrix_multiply[c,r] else
+         (unique_tags[c], unique_tags[r], 1-tag_matrix_multiply[c,r])
          for r, c in zip(row_indices, col_indices) 
-         if tag_matrix_multiply[r,c] >= threshold
          ]
+edgeweights = [e[2] for e in edges]
+edgeweights_max = np.array(edgeweights).mean()
 
-g_tag.add_weighted_edges_from(edges)    
-g_tag_test.add_weighted_edges_from(edges)
+g_tag.add_weighted_edges_from(edges)
 
 # g_tag_pos = nx.draw_spring(g_tag)
 # plt.savefig('../figures/tag_association_tree.png')
 
 
 ## And generate the MST w/ Kruskal's alg
-mst = nx.minimum_spanning_tree(g_tag_test)
+mst = nx.minimum_spanning_tree(g_tag)
+## Here, want to do layout and then add back in some edges
+## See the innovation_space code for details
+## Size would be nice, too
 
-mst_graph_pos = nx.draw_graphviz(mst,
-                                 prog='fdp', ## Doesn't render full graph
-                                 with_labels=False,
-                                 alpha=0.7,
-                                 font_size=4,
-                                 node_size=5
-                                 )
+## Write out the graph file
+nx.write_gexf(mst, '../data/tag_mst_graph.gexf')
+
+## Generate the graph position
+prox_graph_layout = nx.graphviz_layout(mst, prog='neato')
+
+## Add in extra edges and colors
+supp_edgelist = [(e[0], e[1], e[2]) for e in edges if e[2] < 0.98]
+mst.add_weighted_edges_from(supp_edgelist)
+edge_weights = nx.get_edge_attributes(mst, 'weight')
+edge_color = np.array([1-edge_weights[k] for k in edge_weights.keys()])
+
+
+nx.draw_networkx_nodes(mst,
+                       prox_graph_layout,
+                       with_labels=False,
+                       alpha=0.6,
+                       node_size=4,
+                       linewidths=0.2
+                       )
+nx.draw_networkx_edges(mst,
+                       prox_graph_layout,
+                       linewidths=0.5,
+                       edge_color=edge_color,
+                       edge_cmap=plt.cm.get_cmap('BrBG'),
+                       edge_vmin=edge_color.min(),
+                       edge_vmax=edge_color.max()
+                       )
+plt.colorbar()
+plt.show()
+
 plt.savefig('../figures/tag_association_mst.pdf')
+plt.close()
+
 ## Right now, this plots but is really very messed up
 ## Need to use graphviz instead to get the plotting right. 
 ## NEATO layout should work better
