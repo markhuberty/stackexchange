@@ -119,10 +119,11 @@ edge_color = np.array([1-edge_weights[k] for k in edge_weights.keys()])
 
 nx.draw_networkx_nodes(mst,
                        prox_graph_layout,
-                       with_labels=False,
+                       with_labels=True,
                        alpha=0.6,
                        node_size=4,
-                       linewidths=0.2
+                       linewidths=0.2,
+                       font_size=4
                        )
 nx.draw_networkx_edges(mst,
                        prox_graph_layout,
