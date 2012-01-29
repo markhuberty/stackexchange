@@ -115,16 +115,21 @@ supp_edgelist = [(e[0], e[1], e[2]) for e in edges if e[2] < 0.75]
 mst.add_weighted_edges_from(supp_edgelist)
 edge_weights = nx.get_edge_attributes(mst, 'weight')
 edge_color = np.array([1-edge_weights[k] for k in edge_weights.keys()])
-
+node_labels = {}
+for n in mst.nodes():
+    node_labels[n] = n
 
 nx.draw_networkx_nodes(mst,
                        prox_graph_layout,
-                       with_labels=True,
                        alpha=0.6,
                        node_size=4,
                        linewidths=0.2,
-                       font_size=4
                        )
+nx.draw_networkx_labels(mst,
+                        prox_graph_layout
+                        labels=node_labels,
+                        font_size=4
+                        )
 nx.draw_networkx_edges(mst,
                        prox_graph_layout,
                        linewidths=0.5,
