@@ -32,8 +32,9 @@ tag_frequency = [tag_frequency[0,i] for i in range(tag_frequency.shape[1])]
 tag_frequency = np.array(tag_frequency)
 
 ## Take only the top tags based on median tag counts
-bool_top_tags = tag_frequency >= tag_frequency.median()
+bool_top_tags = tag_frequency >= np.median(tag_frequency)
 idx_top_tags = [i for i,b in enumerate(bool_top_tags) if b]
+print len(idx_top_tags)
 tag_matrix = tag_matrix[:,idx_top_tags]
 unique_tags = [unique_tags[i] for i in idx_top_tags]
 tag_frequency = [tag_frequency[i] for i in idx_top_tags]
