@@ -111,7 +111,7 @@ nx.write_gexf(mst, '../data/tag_mst_graph.gexf')
 prox_graph_layout = nx.graphviz_layout(mst, prog='neato')
 
 ## Add in extra edges and colors
-supp_edgelist = [(e[0], e[1], e[2]) for e in edges if e[2] < 0.5]
+supp_edgelist = [(e[0], e[1], e[2]) for e in edges if e[2] < 0.75]
 mst.add_weighted_edges_from(supp_edgelist)
 edge_weights = nx.get_edge_attributes(mst, 'weight')
 edge_color = np.array([1-edge_weights[k] for k in edge_weights.keys()])
