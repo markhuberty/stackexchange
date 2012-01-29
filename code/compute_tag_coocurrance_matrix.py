@@ -126,7 +126,7 @@ nx.draw_networkx_nodes(mst,
                        linewidths=0.2,
                        )
 nx.draw_networkx_labels(mst,
-                        prox_graph_layout
+                        prox_graph_layout,
                         labels=node_labels,
                         font_size=4
                         )
