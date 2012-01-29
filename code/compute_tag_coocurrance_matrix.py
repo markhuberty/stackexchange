@@ -5,7 +5,7 @@ import networkx as nx
 import os
 import pickle
 import matplotlib as mpl
-#mpl.use('Agg') ## Allows mpl to function w/o active X session
+mpl.use('Agg') ## Allows mpl to function w/o active X session
 import matplotlib.pyplot as plt
 
 os.chdir('/home/markhuberty/Documents/stackexchange/code/')
@@ -83,10 +83,9 @@ with open(filename, 'wt') as f:
 g_tag = nx.Graph()
 
 ## Then add the edges as weights
-## Get values below threshold
-threshold = 0.0
+## Takes the max values
 edges = [(unique_tags[r], unique_tags[c], 1-tag_matrix_multiply[r,c])
-         if tag_matrix_multiply[r,c] < tag_matrix_multiply[c,r] else
+         if tag_matrix_multiply[r,c] > tag_matrix_multiply[c,r] else
          (unique_tags[c], unique_tags[r], 1-tag_matrix_multiply[c,r])
          for r, c in zip(row_indices, col_indices) 
          ]
@@ -112,7 +111,7 @@ nx.write_gexf(mst, '../data/tag_mst_graph.gexf')
 prox_graph_layout = nx.graphviz_layout(mst, prog='neato')
 
 ## Add in extra edges and colors
-supp_edgelist = [(e[0], e[1], e[2]) for e in edges if e[2] < 0.98]
+supp_edgelist = [(e[0], e[1], e[2]) for e in edges if e[2] < 0.5]
 mst.add_weighted_edges_from(supp_edgelist)
 edge_weights = nx.get_edge_attributes(mst, 'weight')
 edge_color = np.array([1-edge_weights[k] for k in edge_weights.keys()])
@@ -134,8 +133,6 @@ nx.draw_networkx_edges(mst,
                        edge_vmax=edge_color.max()
                        )
 plt.colorbar()
-plt.show()
-
 plt.savefig('../figures/tag_association_mst.pdf')
 plt.close()
 
