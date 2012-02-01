@@ -106,13 +106,13 @@ mst = nx.minimum_spanning_tree(g_tag)
 ## Size would be nice, too
 
 ## Write out the graph file
-nx.write_gexf(mst, '../data/tag_mst_graph.gexf')
+#nx.write_gexf(mst, '../data/tag_mst_graph.gexf')
 
 ## Generate the graph position
-prox_graph_layout = nx.graphviz_layout(mst, prog='neato')
+#prox_graph_layout = nx.graphviz_layout(mst, prog='neato')
 
 ## Add in extra edges and colors
-supp_edgelist = [(e[0], e[1], e[2]) for e in edges if e[2] < 0.75]
+supp_edgelist = [(e[0], e[1], e[2]) for e in edges if e[2] < 0.5]
 mst.add_weighted_edges_from(supp_edgelist)
 edge_weights = nx.get_edge_attributes(mst, 'weight')
 edge_color = np.array([1-edge_weights[k] for k in edge_weights.keys()])
@@ -120,19 +120,21 @@ node_labels = {}
 for n in mst.nodes():
     node_labels[n] = n
 
+prox_graph_full_layout = nx.graphviz_layout(mst, prog='neato')
+
 nx.draw_networkx_nodes(mst,
-                       prox_graph_layout,
+                       prox_graph_full_layout,
                        alpha=0.6,
                        node_size=4,
                        linewidths=0.2,
                        )
 nx.draw_networkx_labels(mst,
-                        prox_graph_layout,
+                        prox_graph_full_layout,
                         labels=node_labels,
-                        font_size=2
+                        font_size=0.5
                         )
 nx.draw_networkx_edges(mst,
-                       prox_graph_layout,
+                       prox_graph_full_layout,
                        linewidths=0.5,
                        edge_color=edge_color,
                        edge_cmap=plt.cm.get_cmap('BrBG'),
@@ -140,7 +142,7 @@ nx.draw_networkx_edges(mst,
                        edge_vmax=edge_color.max()
                        )
 plt.colorbar()
-plt.savefig('../figures/tag_association_mst.pdf')
+plt.savefig('../figures/tag_association_mst_full.pdf')
 plt.close()
 
 ## Right now, this plots but is really very messed up
