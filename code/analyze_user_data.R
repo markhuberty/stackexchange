@@ -13,19 +13,27 @@ library(stringr)
 library(Hmisc)
 library(gdata)
 
+## Define some useful functions
 title.wrapper <- wrapper <- function(x, ...){
   paste(strwrap(x, ...), collapse = "\n")
 }
 
+## Load in the geocoded locations from the yahoo
+## geocode file
 geocoded.locations <- read.csv("./data/location_geocoded_final.csv",
                                header=TRUE
                                )
+
+## Load in the ISO country code file
 country.codes <- read.csv("./data/iso_country_codes.csv", header=TRUE)
 country.codes$country <- tolower(country.codes$country)
 
 ## Process the CSV file
 geocoded.locations$name <- as.character(geocoded.locations$name)
 
+## Dump locations that dont contain countries
+## Then grab the 2-character country code from the
+## end of the location name
 formatted.locations <- foreach(x=1:nrow(geocoded.locations),
                                .combine="rbind") %do% {
 
@@ -35,6 +43,7 @@ formatted.locations <- foreach(x=1:nrow(geocoded.locations),
      geocoded.locations$type[x] != "Ocean")
     {
 
+      ## This is the country code grab
       country <- str_sub(geocoded.locations$name[x], start = -2)
 
       return(c(as.character(geocoded.locations$name[x]),
@@ -43,7 +52,8 @@ formatted.locations <- foreach(x=1:nrow(geocoded.locations),
                as.character(geocoded.locations$type[x])
                )
              )
-      
+      ## If only country is returned, crosswalk the country name
+      ## to the country code
     }else if(geocoded.locations$type[x] == "Country"){
 
       country <- tolower(geocoded.locations$name[x])
@@ -63,7 +73,8 @@ formatted.locations <- foreach(x=1:nrow(geocoded.locations),
     }
 }
   
-
+## With the location data, merge it into the big
+## users file
 formatted.locations <- as.data.frame(formatted.locations)
 names(formatted.locations) <- c("name",
                                 "orig.location",
@@ -87,11 +98,17 @@ users.df.new <- merge(users.df.location,
                       all.x=TRUE,
                       all.y=FALSE
                       )
+## And write it out.
+write.csv(users.df.new, file="./data/users_geocoded_final.csv",
+          row.names=FALSE,
+          )
 
+## Look at users per-capita based on the world bank population data
 ## Need to get the code / sums and then merge w/ total pop and divide out
 iso.code.conversion <- read.csv("./data/iso_country_code_conversion.csv")
 wb.total.pop <- read.csv("./data/wb_total_population.csv")
 
+## add the iso codes to the world bank codes
 wb.total.pop <- merge(wb.total.pop,
                       iso.code.conversion,
                       by.x="Country.Code",
@@ -99,10 +116,12 @@ wb.total.pop <- merge(wb.total.pop,
                       )
 wb.total.pop <- wb.total.pop[,c("A2", "X2008")]
 
+## Count users by country
 user.country.counts <- tapply(rep(1, nrow(users.df.new)),
                               users.df.new$country.code,
                               sum
                               )
+## Average user rep by country
 user.country.mean.rep <- tapply(users.df.new$Reputation,
                            users.df.new$country.code,
                            mean
@@ -121,24 +140,29 @@ names(user.country.counts) <- c("country.code",
                                 "user.mean.rep",
                                 "user.sd.rep"
                                 )
-
+## Merge in the world bank data with the
+## user data on the basis of the country code
 user.country.counts <- merge(user.country.counts,
                              wb.total.pop,
                              by.x="country.code",
                              by.y="A2"
                              )
+## Get users per capita; calculate log users per capita 
 user.country.counts$user.pc <-
   user.country.counts$user.count / user.country.counts$X2008
 user.country.counts$pc.quantile <- cut2(user.country.counts$user.pc,
                                         g=5
                                         )
+
+## Trick: reorder the country code factor levels based on
+## users per-capita; this comes in handy further down
 user.country.counts$country.code <-
                              reorder(user.country.counts$country.code,
                                      user.country.counts$user.pc
                                      )
 user.country.counts$log.user.pc <- log(user.country.counts$user.pc)
 
-
+## Subset countries I care about
 country.sub <- c("AU",
                  "US",
                  "GB",
@@ -187,12 +211,13 @@ user.country.counts.sub$country.code <-
   factor(user.country.counts.sub$country.code,
          levels=user.country.counts.sub$country.code[order(user.country.counts.sub$log.user.pc)])
 
+## Plot the user per capita data
 plot.user.freq.pc <-
-                            ggplot(user.country.counts.sub,
-                                   aes(x=country.code,
-                                       y=log.user.pc
-                                       )
-                                   ) +
+  ggplot(user.country.counts.sub,
+         aes(x=country.code,
+             y=log.user.pc
+             )
+         ) +
   geom_point() +
   scale_y_continuous("Log users per capita") +
   scale_x_discrete("Country") + 
@@ -213,7 +238,7 @@ country.count.sub <-
 users.df.new.sub <- drop.levels(users.df.new[users.df.new$country.code
                                              %in% country.count.sub,])
 
-
+## Stuff below looks at other covariates, not directly relevant.
 format.date <- function(d){
 
   d <- str_split(d, "T")
