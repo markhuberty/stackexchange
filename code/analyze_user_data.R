@@ -105,7 +105,9 @@ write.csv(users.df.new, file="./data/users_geocoded_final.csv",
 
 ## Look at users per-capita based on the world bank population data
 ## Need to get the code / sums and then merge w/ total pop and divide out
-iso.code.conversion <- read.csv("./data/iso_country_code_conversion.csv")
+iso.code.conversion <- read.csv("./data/iso_country_code_conversion.csv",
+                                header=TRUE
+                                )
 wb.total.pop <- read.csv("./data/wb_total_population.csv")
 
 ## add the iso codes to the world bank codes
@@ -200,7 +202,7 @@ country.sub <- c("AU",
                  "RU",
                  "MX"
                  )
-## 27 eu members + us, ca, au, nz, ch, no, il = 34                 
+## 27 eu members + us, ca, au, nz, ch, no, il ru = 35                 
                  
 
 user.country.counts.sub <-
@@ -365,6 +367,7 @@ compute.overall.ks <- function(variable, factor){
   
 
 }
+
 
 ## Test each distribution against all others to determine
 ## exchangeability among pairwise countries
