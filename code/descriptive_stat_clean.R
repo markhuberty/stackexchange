@@ -10,11 +10,6 @@ library(gdata)
 user <-
   read.csv("C:/Users/miaomiaocui/Documents/test/stackexchange/data/users_geocoded_final.csv",header=TRUE)
 
-user <-
-  read.csv("~/Documents/Research/Papers/stackexchange/data/users_geocoded_final.csv",
-           header=TRUE
-           )
-
 #take out user location
 user$Location <-NULL
 user$Id <- NULL
