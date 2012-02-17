@@ -175,7 +175,10 @@ user.sub.med.duration <- data.frame(calc.boot(user.sub$duration,
 
 plot.mean.rep <- ggplot(user.sub.mean.rep,
                         aes(x=V1,y=V2,ymin=X2.5.,ymax=X97.5.,
-                            colour=cut))+geom_pointrange()+opts(title="mean.rep")
+                            colour=cut))+geom_point(user.sub.mean.rep,x=user.sub.mean.rep$V1,y=
+                              user.sub.mean.rep$V2)+
+                          geom_range(user.sub.mean.rep,x=user.sub.mean.rep$V1,ymin=X2.5,ymax=X97.5)
+                          +opts(title="mean.rep")
 
 
 plot.mean.up <- ggplot(user.sub.mean.up,
