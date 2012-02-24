@@ -191,7 +191,7 @@ plot.mean.rep <- ggplot(user.sub.mean.rep,
                             colour=cut)
                         ) +
   geom_pointrange() +
-  opts(title="mean.rep")
+  opts(title="User mean reputation",axis.text.x=theme_text(size=6))
 print(plot.mean.rep)
 
 plot.mean.up <- ggplot(user.sub.mean.up,
@@ -201,8 +201,8 @@ plot.mean.up <- ggplot(user.sub.mean.up,
                             ymax=ci.upper,
                             colour=cut)
                        ) + geom_pointrange() +
-  opts(title="mean.up") +
-  coord_flip()
+  opts(title="User mean upvotes",
+       axis.text.x=theme_text(size=6)) 
 print(plot.mean.up)
 
 plot.mean.dn <- ggplot(user.sub.mean.dn,
@@ -213,8 +213,8 @@ plot.mean.dn <- ggplot(user.sub.mean.dn,
                            colour=cut)
                        ) +
   geom_pointrange() +
-  opts(title="mean.dn") +
-  coord_flip()
+  opts(title="User mean downvotes",axis.text.x=theme_text(size=6))
+  
 print(plot.mean.dn)
 
 plot.mean.duration <- ggplot(user.sub.mean.duration,
@@ -222,8 +222,8 @@ plot.mean.duration <- ggplot(user.sub.mean.duration,
                                  colour=cut)
                              ) +
   geom_pointrange() +
-  opts(title="mean.duration") +
-  coord_flip()
+  opts(title="User mean duration",axis.text.x=theme_text(size=6)) 
+
 print(plot.mean.duration)
 
 plot.med.up <- ggplot(user.sub.med.up,
@@ -234,8 +234,8 @@ plot.med.up <- ggplot(user.sub.med.up,
                             colour=cut)
                       ) +
   geom_pointrange() +
-  opts(title="med.up") +
-  coord_flip()
+  opts(title="User median upvotes",axis.text.x=theme_text(size=6)) 
+
 print(plot.med.up)
 
 plot.med.rep <- ggplot(user.sub.med.rep,
@@ -246,8 +246,7 @@ plot.med.rep <- ggplot(user.sub.med.rep,
                            colour=cut)
                        ) +
   geom_pointrange() +
-  opts(title="med.rep") +
-  coord_flip()
+  opts(title="Uswer median reputation",axis.text.x=theme_text(size=6)) 
 print(plot.med.rep)
 
 
@@ -260,8 +259,8 @@ plot.med.dn <- ggplot(user.sub.med.dn,
                           colour=cut)
                       ) +
   geom_pointrange() +
-  opts(title="med.dn") +
-  coord_flip()
+  opts(title="User median downvotes",axis.text.x=theme_text(size=6)) 
+
 print(plot.med.dn)
 
 
@@ -272,10 +271,36 @@ plot.med.duration <- ggplot(user.sub.med.duration,
                                 ymax=ci.upper,
                                 colour=cut)) +
   geom_pointrange() +
-  opts(title="med.diffdate") +
-  coord_flip()
+  opts(title="User median duration",axis.text.x=theme_text(size=6)) 
 print(plot.med.duration)
 
+
+plot.rep.up.dn.mean<-ggplot()+geom_pointrange(data=user.sub.mean.rep,
+                                         aes(x=country,y=sum.stat,ymin=ci.lower,ymax=ci.upper,col="reputation.mean"))+
+                                           geom_pointrange(data=user.sub.mean.up,aes(x=country,y=sum.stat,
+                                                                                ymin=ci.lower,
+                                                                                ymax=ci.upper,col="upvotes.mean"))+
+                                           geom_pointrange(data=user.sub.mean.dn,aes(x=country,y=sum.stat,
+                                                                                ymin=ci.lower,
+                                                                                ymax=ci.upper,col="downvotes.mean"))+
+                                           opts(title="Contribution to mean reputation",
+                                                axis.text.x=theme_text(size=6))
+print(plot.rep.up.dn.mean)
+
+
+plot.rep.up.dn.med<-ggplot()+geom_pointrange(data=user.sub.med.rep,
+                                              aes(x=country,y=sum.stat,ymin=ci.lower,ymax=ci.upper,col="reputation.med"))+
+                                                geom_pointrange(data=user.sub.med.up,aes(x=country,y=sum.stat,
+                                                                                          ymin=ci.lower,
+                                                                                          ymax=ci.upper,col="upvotes.med"))+
+                                                                                            geom_pointrange(data=user.sub.med.dn,aes(x=country,y=sum.stat,
+                                                                                                                                      ymin=ci.lower,
+                                                                                                                                      ymax=ci.upper,col="downvotes.med"))+
+                                                                                                                                        opts(title="Contribution to median reputation",
+                                                                                                                                             axis.text.x=theme_text(size=6))
+print(plot.rep.up.dn.med)
+      
+      
 
 ## Two plots to look at the numeric variables
 ## This gets at similar ideas in a different way using
@@ -287,36 +312,51 @@ user.sub.numeric <- user.sub[,c("country.code", "Reputation",
                                 "LastAccD",
                                 "duration")
                              ]
-## Subset the whole thing on reputation
-user.sub.numeric <-
-  drop.levels(user.sub.numeric[user.sub.numeric$Reputation > 1,])
-## Take logs as necessary, then melt
+
 user.sub.numeric$Reputation <- log10(user.sub.numeric$Reputation)
 user.sub.numeric$UpVotes <- log10(user.sub.numeric$UpVotes + 1)
 user.sub.numeric$DownVotes <- log10(user.sub.numeric$DownVotes + 1)
 user.sub.numeric.melt <- melt(user.sub.numeric, id.var="country.code")
 
+plot.numeric.density <- ggplot(user.sub.numeric.melt,aes(x=value,group=country.code)) +
+                                geom_density() +
+                                geom_density(aes(x=value, group=NULL), col="red") + 
+                                facet_wrap( ~ variable, scales="free")+
+                                opts(title="Densities (reputation >=0),entire data in red")
+print(plot.numeric.density)
+
+## Subset the whole thing on reputation
+user.sub.numeric.h <-
+  drop.levels(user.sub.numeric[user.sub.numeric$Reputation > 1,])
+## Take logs as necessary, then melt
+user.sub.numeric.h$Reputation <- log10(user.sub.numeric.h$Reputation)
+user.sub.numeric.h$UpVotes <- log10(user.sub.numeric.h$UpVotes + 1)
+user.sub.numeric.h$DownVotes <- log10(user.sub.numeric.h$DownVotes + 1)
+user.sub.numeric.h.melt <- melt(user.sub.numeric.h, id.var="country.code")
+
+
 
 ## First, boxplots for each numeric variable
 ## by country, on a single plot
-plot.numeric.box <- ggplot(user.sub.numeric.melt,
-                           aes(x=country.code,
-                               y=value
-                               )
-                           ) +
-  geom_boxplot() +
-  facet_wrap(~ variable, scales="free") 
-print(plot.numeric.box)
+# plot.numeric.box <- ggplot(user.sub.numeric.h.melt,
+#                            aes(x=country.code,
+#                                y=value
+#                                )
+#                            ) +
+#   geom_boxplot() +
+#   facet_wrap(~ variable, scales="free") 
+# print(plot.numeric.box)
 
 ## Second, the same data, portrayed as densities rather than
 ## ranges. The value for the entire data set is overlaid in red
 ## on the values for each country.
-plot.numeric.density <- ggplot(user.sub.numeric.melt,
+plot.numeric.density.h <- ggplot(user.sub.numeric.h.melt,
                                aes(x=value,
                                    group=country.code
                                    )
                                ) +
   geom_density() +
   geom_density(aes(x=value, group=NULL), col="red") + 
-  facet_wrap( ~ variable, scales="free")
-print(plot.numeric.density)
+  facet_wrap( ~ variable, scales="free")+
+  opts(title="Densities (reputation>1), entire data in red")
+print(plot.numeric.density.h)
