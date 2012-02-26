@@ -49,7 +49,7 @@ def map_q_skill(questions, tags, skills):
 tag_mat_csr = tag_mat['tag_matrix'].tocsr()
 unique_tags = tag_mat['unique_tags']
 
-question_skill_map = map_q_skill(tag_mat_csr[1:10,:], unique_tags, skill_cat)
+question_skill_map = map_q_skill(tag_mat_csr, unique_tags, skill_cat)
 
 filename = './data/question_skill_map.pickle'
 with open(filename, 'wt') as f:

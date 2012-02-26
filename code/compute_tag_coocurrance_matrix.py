@@ -131,7 +131,7 @@ mst = nx.minimum_spanning_tree(g_tag)
 supp_edgelist = [(e[0], e[1], e[2]) for e in edges if e[2] < 0.5]
 mst.add_weighted_edges_from(supp_edgelist)
 
-write_mcl_format(mst, './data/g_tag_mst_mcl.txt')
+write_mcl_format(mst, '../data/g_tag_mst_mcl.txt')
 
 edge_weights = nx.get_edge_attributes(mst, 'weight')
 edge_color = np.array([1-edge_weights[k] for k in edge_weights.keys()])
