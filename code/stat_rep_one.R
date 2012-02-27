@@ -16,6 +16,7 @@ library(gdata)
 #count user with rep <=1, by country
 
 user.sub.lowrep <- user.sub[user.sub$Reputation<=1,]
+user.sub.highrep<- user.sub[user.sub$Reputation>1,]
 
 user.sub.lowrep.count.country<- data.frame(tapply(rep(1,nrow(user.sub.lowrep)),
                                       user.sub.lowrep$country.code,
@@ -75,7 +76,9 @@ plot.hist.low.duration  <- ggplot(user.sub.lowrep,
                      ) + 
                        geom_histogram() + 
                        facet_wrap(~country.code, scales="free_y")+
-                       opts(title="Duration for reputation <1")
+                       opts(title="Time between account creation date and last access date 
+                            for users with reputation <=1",axis.text.x=theme_text(
+                         angle=90, hjust=1, size=6))
 print(plot.hist.low.duration)
 
 plot.hist.high.duration  <- ggplot(user.sub.highrep,
@@ -83,7 +86,9 @@ plot.hist.high.duration  <- ggplot(user.sub.highrep,
                      ) + 
                        geom_histogram() + 
                        facet_wrap(~country.code, scales="free_y")+
-                       opts(title="Duration for reputation >=1")
+                       opts(title="Time between account creation date and last access date 
+                            for users with reputation >1",axis.text.x=theme_text(
+                              angle=90, hjust=1, size=6))
 print(plot.hist.high.duration)
 
 plot.hist.low.create  <- ggplot(user.sub.lowrep,
@@ -91,15 +96,20 @@ plot.hist.low.create  <- ggplot(user.sub.lowrep,
                                   ) + 
                                     geom_histogram() + 
                                     facet_wrap(~country.code, scales="free_y")+
-                                    opts(title="Creation date for reputation <1")
+                                    opts(title="Account creation date for reputation <=1",axis.text.x=theme_text(
+                                      angle=90, hjust=1, size=6))+
+                                        labs(x="creation date")
 print(plot.hist.low.create)
+
 
 plot.hist.high.create  <- ggplot(user.sub.highrep,
                                    aes(x=as.integer(CreatD))
                                    ) + 
                                      geom_histogram() + 
                                      facet_wrap(~country.code, scales="free_y")+
-                                     opts(title="Creation date for reputation >=1")
+                                     opts(title="Account creation date for reputation >1",axis.text.x=theme_text(
+                                       angle=90, hjust=1, size=6))+
+                                         labs(x="creation date")
 print(plot.hist.high.create)
 
 plot.hist.low.lastacc  <- ggplot(user.sub.lowrep,
@@ -107,7 +117,9 @@ plot.hist.low.lastacc  <- ggplot(user.sub.lowrep,
                                   ) + 
                                     geom_histogram() + 
                                     facet_wrap(~country.code, scales="free_y")+
-                                    opts(title="Last access date for reputation <1")
+                                    opts(title="Account last access date for reputation <=1",axis.text.x=theme_text(
+                                      angle=90, hjust=1, size=6))+
+                                        labs(x="last access date")
 print(plot.hist.low.lastacc)
 
 plot.hist.high.lastacc  <- ggplot(user.sub.highrep,
@@ -115,6 +127,8 @@ plot.hist.high.lastacc  <- ggplot(user.sub.highrep,
                                    ) + 
                                      geom_histogram() + 
                                      facet_wrap(~country.code, scales="free_y")+
-                                     opts(title="Last access date for reputation >1")
+                                     opts(title="Account last access date for reputation >1",axis.text.x=theme_text(
+                                       angle=90, hjust=1, size=6))+
+                                         labs(x="last access date")
 print(plot.hist.high.lastacc)
 

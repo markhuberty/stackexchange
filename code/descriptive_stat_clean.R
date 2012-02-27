@@ -17,6 +17,7 @@ user$DisplayName <- NULL
 
 #take out uninteresting countries
 country.sub <- c("AU",
+                 "JP",
                  "US",
                  "GB",
                  "DE",
@@ -222,7 +223,8 @@ plot.mean.duration <- ggplot(user.sub.mean.duration,
                                  colour=cut)
                              ) +
   geom_pointrange() +
-  opts(title="User mean duration",axis.text.x=theme_text(size=6)) 
+  opts(title="User mean duration between account creation date and last access date",axis.text.x=theme_text(size=6))+
+  labs(x="Countries",y="Mean Duration")
 
 print(plot.mean.duration)
 
@@ -271,33 +273,36 @@ plot.med.duration <- ggplot(user.sub.med.duration,
                                 ymax=ci.upper,
                                 colour=cut)) +
   geom_pointrange() +
-  opts(title="User median duration",axis.text.x=theme_text(size=6)) 
+  opts(title="User median duration between account creation date and last access date",axis.text.x=theme_text(size=6))+
+  labs(x="Countires",y="Median Duration")
 print(plot.med.duration)
 
 
 plot.rep.up.dn.mean<-ggplot()+geom_pointrange(data=user.sub.mean.rep,
-                                         aes(x=country,y=sum.stat,ymin=ci.lower,ymax=ci.upper,col="reputation.mean"))+
+                                         aes(x=country,y=sum.stat,ymin=ci.lower,ymax=ci.upper,col="reputation(mean,log)"))+
                                            geom_pointrange(data=user.sub.mean.up,aes(x=country,y=sum.stat,
                                                                                 ymin=ci.lower,
-                                                                                ymax=ci.upper,col="upvotes.mean"))+
+                                                                                ymax=ci.upper,col="upvotes(mean,log)"))+
                                            geom_pointrange(data=user.sub.mean.dn,aes(x=country,y=sum.stat,
                                                                                 ymin=ci.lower,
-                                                                                ymax=ci.upper,col="downvotes.mean"))+
+                                                                                ymax=ci.upper,col="downvotes.mean(mean,log)"))+
                                            opts(title="Contribution to mean reputation",
-                                                axis.text.x=theme_text(size=6))
+                                                axis.text.x=theme_text(size=6))+
+                                                  labs(x="Countries",y="Counts(mean,log)")
 print(plot.rep.up.dn.mean)
 
 
 plot.rep.up.dn.med<-ggplot()+geom_pointrange(data=user.sub.med.rep,
-                                              aes(x=country,y=sum.stat,ymin=ci.lower,ymax=ci.upper,col="reputation.med"))+
+                                              aes(x=country,y=sum.stat,ymin=ci.lower,ymax=ci.upper,col="reputation(median,log)"))+
                                                 geom_pointrange(data=user.sub.med.up,aes(x=country,y=sum.stat,
                                                                                           ymin=ci.lower,
-                                                                                          ymax=ci.upper,col="upvotes.med"))+
+                                                                                          ymax=ci.upper,col="upvotes(median,log)"))+
                                                                                             geom_pointrange(data=user.sub.med.dn,aes(x=country,y=sum.stat,
                                                                                                                                       ymin=ci.lower,
-                                                                                                                                      ymax=ci.upper,col="downvotes.med"))+
+                                                                                                                                      ymax=ci.upper,col="downvotes(median,log)"))+
                                                                                                                                         opts(title="Contribution to median reputation",
-                                                                                                                                             axis.text.x=theme_text(size=6))
+                                                                                                                                             axis.text.x=theme_text(size=6))+labs(x="Countries",y="Counts(median,log)")
+
 print(plot.rep.up.dn.med)
       
       
@@ -310,29 +315,38 @@ print(plot.rep.up.dn.med)
 user.sub.numeric <- user.sub[,c("country.code", "Reputation",
                                 "UpVotes", "DownVotes", "CreatD",
                                 "LastAccD",
-                                "duration")
-                             ]
+                                "duration")]
 
-user.sub.numeric$Reputation <- log10(user.sub.numeric$Reputation)
-user.sub.numeric$UpVotes <- log10(user.sub.numeric$UpVotes + 1)
-user.sub.numeric$DownVotes <- log10(user.sub.numeric$DownVotes + 1)
-user.sub.numeric.melt <- melt(user.sub.numeric, id.var="country.code")
+user.sub.numeric.all <- user.sub.numeric
+                             
+names(user.sub.numeric.all) <- c("Countries","Reputation.log","UpVotes.log", "DownVotes.log", 
+                             "CreationDate", "LastAccessDate", "Duration")
+user.sub.numeric.all$Reputation.log <- log10(user.sub.numeric.all$Reputation.log)
+user.sub.numeric.all$UpVotes.log <- log10(user.sub.numeric.all$UpVotes.log + 1)
+user.sub.numeric.all$DownVotes.log <- log10(user.sub.numeric.all$DownVotes.log + 1)
+user.sub.numeric.all.melt <- melt(user.sub.numeric.all, id.var="Countries")
 
-plot.numeric.density <- ggplot(user.sub.numeric.melt,aes(x=value,group=country.code)) +
+
+plot.numeric.density <- ggplot(user.sub.numeric.all.melt,aes(x=value,group=Countries)) +
                                 geom_density() +
                                 geom_density(aes(x=value, group=NULL), col="red") + 
                                 facet_wrap( ~ variable, scales="free")+
-                                opts(title="Densities (reputation >=0),entire data in red")
+                                opts(title="Densities (reputation >=0),entire data in red"
+                                     )
+                               
 print(plot.numeric.density)
 
 ## Subset the whole thing on reputation
 user.sub.numeric.h <-
   drop.levels(user.sub.numeric[user.sub.numeric$Reputation > 1,])
+names(user.sub.numeric.h) <- c("Countries","Reputation.log","UpVotes.log", "DownVotes.log", 
+                                 "CreationDate", "LastAccessDate", "Duration")
+
 ## Take logs as necessary, then melt
-user.sub.numeric.h$Reputation <- log10(user.sub.numeric.h$Reputation)
-user.sub.numeric.h$UpVotes <- log10(user.sub.numeric.h$UpVotes + 1)
-user.sub.numeric.h$DownVotes <- log10(user.sub.numeric.h$DownVotes + 1)
-user.sub.numeric.h.melt <- melt(user.sub.numeric.h, id.var="country.code")
+user.sub.numeric.h$Reputation.log <- log10(user.sub.numeric.h$Reputation.log)
+user.sub.numeric.h$UpVotes.log <- log10(user.sub.numeric.h$UpVotes.log + 1)
+user.sub.numeric.h$DownVotes.log <- log10(user.sub.numeric.h$DownVotes.log + 1)
+user.sub.numeric.h.melt <- melt(user.sub.numeric.h, id.var="Countries")
 
 
 
@@ -352,7 +366,7 @@ user.sub.numeric.h.melt <- melt(user.sub.numeric.h, id.var="country.code")
 ## on the values for each country.
 plot.numeric.density.h <- ggplot(user.sub.numeric.h.melt,
                                aes(x=value,
-                                   group=country.code
+                                   group=Countries
                                    )
                                ) +
   geom_density() +

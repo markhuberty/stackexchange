@@ -56,10 +56,11 @@ plot.experience.country <- ggplot(survey,
                            )+
                              geom_histogram()+
                              facet_wrap(~country.code,scales="free_y")+
-                             opts(title="survey user experience histogram by country",
+                             opts(title="Survey user experience histogram by country",
                                   axis.text.x=theme_text(
                                     angle=90, hjust=1, size=6)
-                                  )
+                                  )+
+                            labs(x="experience")
 print(plot.experience.country)
 
 #plot age distribution
@@ -69,10 +70,10 @@ plot.age.country <- ggplot(survey,
                            )+
                              geom_histogram()+
                              facet_wrap(~country.code,scales="free_y")+
-                             opts(title="survey user age histogram by country",
+                             opts(title="Survey user age histogram by country",
                                axis.text.x=theme_text(
                                  angle=90, hjust=1, size=6)
-                                  )
+                                  )+labs(x="age")
 print(plot.age.country)
 
 #plot industry distribution
@@ -82,10 +83,10 @@ plot.industry.country <- ggplot(survey,
                            )+
                              geom_histogram()+
                              facet_wrap(~country.code,scales="free_y")+
-                             opts(title="survey user industry histogram by country and region",
+                             opts(title="Survey user industry histogram by country and region",
                                   axis.text.x=theme_text(
                                     angle=90,hjust=1,size=6)
-                                  )
+                                  )+labs(x="industry")
 print(plot.industry.country)
 
 #plot occupation distribution
@@ -95,10 +96,10 @@ plot.occupation.country <- ggplot(survey,
                                 )+
                                   geom_histogram()+
                                   facet_wrap(~country.code,scales="free_y")+
-                                  opts(title="survey user occupation histogram by country and region",
+                                  opts(title="Survey user occupation histogram by country and region",
                                        axis.text.x=theme_text(
                                          angle=90,hjust=1,size=6)
-                                       )
+                                       )+labs(x="occupation")
 print(plot.occupation.country)
 
 #plot reputation histogram
@@ -107,10 +108,10 @@ plot.rep.country <- ggplot(survey,
                                   )+
                                     geom_histogram()+
                                     facet_wrap(~country.code,scales="free_y")+
-                                    opts(title="survey user reputationhistogram by country and region",
+                                    opts(title="Survey user reputation histogram by country and region",
                                          axis.text.x=theme_text(
                                            angle=90,hjust=1,size=6)
-                                         )
+                                         )+labs(x="reputation")
 print(plot.rep.country)
 
 #create a data frame with langauges
@@ -155,10 +156,10 @@ plot.language.country <- ggplot(drop.levels(survey.lan.melt[survey.lan.melt$valu
                                   )+
                                     geom_histogram()+
                                     facet_wrap( ~ country.code,scales="free_y")+
-                                    opts(title="survey user language histogram by country",
+                                    opts(title="Survey user programming languages/tools histogram by country",
                                          axis.text.x=theme_text(
                                            angle=90, hjust=1, size=6)
-                                         )
+                                         )+labs(x="programming langauges/tools")
 print(plot.language.country)
 
 
