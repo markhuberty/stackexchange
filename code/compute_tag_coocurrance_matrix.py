@@ -95,25 +95,44 @@ edgeweights_max = np.array(edgeweights).mean()
 
 g_tag.add_weighted_edges_from(edges)
 
-# g_tag_pos = nx.draw_spring(g_tag)
-# plt.savefig('../figures/tag_association_tree.png')
+## Write out for mcl clustering
+
+    
+def write_mcl_format(g, filename):
+    """
+    Takes as input a networkx graph g and a valid filepath as a string. Writes
+    the graph edgelist with weights to a text file of format E1 E2 W,
+    consistent with the file format required by the mcl algorithm.
+
+    See http://www.micans.org/mcl/ for more detail on mcl.
+    """    
+    edges = g.edges()
+    weights = nx.get_edge_attributes(g, 'weight')
+    conn = open(filename, 'wt')
+    ## Note the weight inversion here; again, 
+    for i, e in enumerate(edges):
+        out = map(lambda(x): str(x), [e[0], e[1], 1-weights[e]])
+        conn.write(' '.join(out))
+        conn.write('\n')
+    conn.close()
+    return 'Done'
+
+write_mcl_format(g_tag, '../data/g_tag_mcl.txt')
 
 
 ## And generate the MST w/ Kruskal's alg
 mst = nx.minimum_spanning_tree(g_tag)
+
 ## Here, want to do layout and then add back in some edges
 ## See the innovation_space code for details
 ## Size would be nice, too
 
-## Write out the graph file
-#nx.write_gexf(mst, '../data/tag_mst_graph.gexf')
-
-## Generate the graph position
-#prox_graph_layout = nx.graphviz_layout(mst, prog='neato')
-
 ## Add in extra edges and colors
 supp_edgelist = [(e[0], e[1], e[2]) for e in edges if e[2] < 0.5]
 mst.add_weighted_edges_from(supp_edgelist)
+
+write_mcl_format(mst, '../data/g_tag_mst_mcl.txt')
+
 edge_weights = nx.get_edge_attributes(mst, 'weight')
 edge_color = np.array([1-edge_weights[k] for k in edge_weights.keys()])
 node_labels = {}
