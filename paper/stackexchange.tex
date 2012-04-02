@@ -47,12 +47,43 @@
 
 \maketitle
 \doublespacing
-
+\begin{abstract}
+  Typologies of capitalism emphasize the role of skill formation as
+  both a shaper of and a response to firm incentives for
+  specialization in different forms of technology. However, actual
+  worker skill is usually difficult to measure and costly to
+  observe. We present novel estimates of IT worker skill based on
+  actual observation of skills in practice. We exploit a new data
+  source that allows observation of tens of thousands of users across
+  over fifty countries and three years. Based on these data, and
+  subject to several caveats about the worker population, we find (). 
+\end{abstract}
 \section{Introduction}
 \label{sec:introduction}
- 
-I present new evidence of comparative patterns of specialization and
-technology adoption in the advanced industrial economies. 
+
+Theories of comparative political economy have put substantial
+emphasis on the interaction of welfare state incentives, worker skill,
+and firm choices about how and where to specialize. However,
+measurements of worker skill are often quite coarse. The difficulty of observing individuals at
+work, under similar conditions, across countries has led researchers
+to rely on aggregate
+statistics such as the level of vocational training, the share of
+university-educated individuals in the workforce, and the presence of
+apprenticeship programs. 
+
+We present novel measurements of highly granular skill in a large
+information technology (IT) worker population across many countries. Using data from an open,
+online IT question-and-answer forum, we are able to specify exact
+definitions for skill, skill diversity, and expertise. Using those
+definitions, we can construct very detailed comparisons of comparative
+IT worker skill specialization across both advanced industrial and
+emerging market economies. We believe this is the first use of this
+dataset to measure worker skill.
+
+Within the resolution of the data, and subject to several caveats on
+the selection process, we find ().
+
+
 
 \section{Institutions and skill development}
 \label{sec:inst-skill-devel}
@@ -84,14 +115,21 @@ employees believe that investment in firm-specific skills will be
 rewarded by long employment tenure. 
 
 Empricially, the evidence used to support these claims has typically
-relied on macro-level measures of skill formation, including
-rates university versus vocational training, patenting rates across
-different kinds of technology, and aggregate R\&D
-spending.\footnote{For a full set of metrics, see
+relied on macro-level measures of skill formation, such as the share
+of workers in vocational or continuing education (taken to be
+representative of firm-specific skills), the share of
+university-educated workers (taken to represent more general skills),
+and the role of apprenticeship programs in skill formation.\footnote{For a full set of metrics, see
   \cite{hall2009varieties}.} But these metrics do not directly measure
-worker-level behavior. Rather, they measure aggregate behavior at the
-societal level, and may not adapt to new markets or sectors that have
-different needs for employment.
+worker-level behavior. Moreover, they may mis-identify skill
+specificity. For instance, we may believe that a manager with a
+liberal arts degree from a university has cultivated very general
+skills. But a university-educated statistician working in natural
+language processing in Silicon Valley has a highly specific skillset
+useful for a relatively small set of highly specialized firms. Whether
+that individual should be lumped into the same category as a manager,
+or instead treated like a highly skilled machinist graduate of an
+\textit{Azubi} program in Baden-Wurtemburg is unclear. 
 
 \section{Pursuing new data for measurement}
 \label{sec:data}
@@ -110,11 +148,11 @@ into one of the most comprehensive communities of technical
 information in the world. As of 2011, it reported approximately
 725,000 users, 1.2 million site visits per day, and 4.2 million separate
 answers covering 82\%  of the 1.9 million submitted questions. It had grown from its initial site,
-StackOverflow\footnote{In programming parlance, a stack overflow
-  refers to a program condition in which memory usage exceeds
-  memory allocation, causing a program crash. Hence StackOverflow is,
-  in a sense, excess memory for humans.}, to sites covering everything
-from programming to data security to cooking and philosophy. 
+StackOverflow, to sites covering everything
+from programming to data security to cooking and philosophy. Anecdotal
+evidence suggested that the quality of the site had led recuiters to
+ask for samples of Stackoverflow questions and answers from potential
+hires, as one measure of worker skill.\footnote{cite}
 
 The format of StackExchange interactions can be stylized as follows: a
 user poses a question and tags the question with metadata related to
@@ -170,37 +208,6 @@ a community of their peers. As such, the data provide an opportunity
 to directly observe patterns of specialization of knowledge and
 interaction among IT workers across both countries and time. 
 
-\subsection{Other data needed}
-\label{sec:other-data-needed}
-
-\begin{itemize}
-\item Data to quantify relative rates of participation by
-  nationality on Stackoverflow:
-  \begin{itemize}
-  \item Workforce size by country (OECD)
-  \item High-technology workforce size by country (This appears
-    difficult to get; the OECD publishes data on ``ICT workforce as
-    share of total'', for both a narrow and a wide definition of the
-    ICT workforce; we might have to back it out using those numbers
-    plus total workforce size. See
-    \url{http://www.oecd.org/document/23/0,3746,en_2649_34449_33987543_1_1_1_1,00.html}
-  \end{itemize}
-\item Data needed to quantify overall sector size by various measures:
-  \begin{itemize}
-  \item High-technology sector size by country
-  \item Firm count in high-technology sectors by country
-  \item Startup count in high-technology sectors by country (see the
-    venture capital associations here, I have the EVCA data)
-  \item ICT patents (see OECD, Patents by Technology, which has an ICT
-    category)
-  \end{itemize}
-\end{itemize}
-
-%% Hypotheses here, 
-
- 
-
-
 \section{Research Design}
 \label{sec:research-design}
 
@@ -211,113 +218,248 @@ terms task and skill, and how specificity will be defined.
 \subsection{Definitions}
 \label{sec:definitions}
 
-\subsubsection{Skill specificity}
+\subsubsection{Skill}
 \label{sec:skill-specificity}
 
 \textbf{Skills} will refer to knowledge of the workings of specific
-technologies, such as the $C$ or \textsc{scada} languages
-themselves. Just as someone might be very knowledgeable about fuel
+technologies or technological concepts. These may include, for
+instance, language-specific knowledge in $C$, knowledge of algorithmic
+implementations of specific programming or computer science concepts,
+or operational knowledge of how to set up and administer specific
+kinds of software or software systems. These skills may, in fact, be
+independent from one another. Just as someone might be very knowledgeable about fuel
 injection systems, but not necessarily ever need to rebuild them, so
 could an IT worker be very knowledgeable about the $C$ programming
 language without every using it to, say, optimize highly parallelized
-programs used for scientific computing. Thus we should treat skill
-separately from tasks. 
+programs used for scientific computing.  
 
-We may infer skill specificity from a question-and-answer site
-like StackOverflow by analyzing the co-occurrance of technologies by
-question. If questions about some technology often reference one or
-many other technologies, we may infer that this technology is a more
-\textit{general} technology than one for which questions ask about it
-alone. Thus, for instance, the $C$ programming language is a
-general-purpose technology used for everything from commercial
-software development to scientific computing. In contrast, the
-\textsc{scada} language is used predominately for control of
-industrial machinery. 
+We can define skill on the basis of the metadata attached to each
+question. We treat each unique metadata tag as a member of a skill
+domain. Skill domains in turn are constructed from patterns of
+co-occurrance of metadata tags in questions. Formally, we construct
+the proximity matrix $P$ from a set of questions $Q$, each of which
+contains a subset of tags $t_Q \in T$. We can construct the proximity
+of tag $t_i$ to tag $t_j$ as the conditional probability that a
+question containing $t_i$ also contains $t_j$. In cases where $P(t_i,
+t_j) \neq P(t_j, t_i)$, we take the maximum conditional
+probability.\footnote{The intuition here is straightforward. Consider
+  the \texttt{bash} shell environment for unix. $P(bash | unix)
+  \approx 1$, since \texttt{bash} is almost exclusively a unix
+  tool. But $P(unix | bash) \approx 0$, since there are many, many
+  unix utilities. Taking the minimum conditional probability would
+  wildly understate the relationship between \texttt{bash} and the
+  Unix operating system ecosystem.}
 
-To quantify this definition of specificity, we must first define the
-relationship of technologies to each other. We can quantify this
-relationship as the proximity between any two technologies in the
-question space. Each question
-$q_i, i \in [1...n]$ considers some technologies $T_q$, which are a subset of the entire set of technologies $T_Q$ considered in all
-questions $Q$. The proximity between any two technologies $T_i$ and
-$T_j$ $\in T_Q$ can be defined as the conditional
-probability that they appear in questions together. Formally, $P(T_i
-\in T_q | T_j \in T_q)$ can be defined as:
+\subsubsection{IT workers}
+\label{sec:it-workers}
 
-\begin{equation}
-  \label{eq:1}
-  p_{i,j} = \frac{\sum_{q \in Q} T_i \in T_q | T_j \in T_q}{\sum_{q \in Q} T_j \in T_q}
-\end{equation}
+We define an IT worker as a contributor to and participant in the
+question-and-answer process on Stackoverflow. The April 2011 data dump
+provides information on approximately 700,000 individual users. Within
+this group, we identify two separate
+groups of users: those who provide geographic information in their
+user profiles (approximately 130,000 individuals) and those who do
+not. For those users who provide geography information, we
+disambiguate that data using the Yahoo GeoDict webservice.\footnote{\url{http://developer.yahoo.com/geo/placemaker/}} This
+service provides a scriptable API which translates unstructured
+geographic information into a standardized format.\footnote{For
+  instance, variants like ``Karlsruhe'', ``Karlsruhe, Germany'', and
+  ``Karlsruhe, Deutschland'' are all translated into a common format
+  specifying city and country in a parsable JSON format.}
 
+\subsubsection{IT worker skill}
+\label{sec:it-worker-skill}
 
+Each worker $w \in W$ is associated with a set of answers $A_w$. Each
+answer is associated to a question $Q$, which has a set of metadata
+tags $T_Q$. We assign each question to a skill or skills based on the
+share of tags found in skill cluster $S$. Thus, for instance, a
+question that had four tags, for which two were found in one skill
+cluster and two in another, would be scored as 50\% skill 1 and 50\%
+skill 2.  
 
-\subsubsection{Task proximity}
-\label{sec:task-specificity}
-
-\textbf{Tasks} will refer to the application of
-technologies. Consistent with the definition in equation \ref{eq:1},
-we will begin to define task specificity by first defining task
-proximity. Task proximity is the conditional probability of
-co-occurrance of tasks in the question metadata. Thus, for instance, if questions regarding thread
-optimization also deal with memory optimization, but rarely deal with
-web page design, then we would regard thread and memory optimization
-as more proximate tasks than thread optimization and web page design. Using the same notation as above, 
-
-Each question
-$q_i, i \in [1...n]$ considers some tasks $K_q$, which are a subset of the entire set of tasks $K_Q$ considered in all
-questions $Q$. The proximity between any two tasks $K_i$ and
-$K_j$ $\in K_Q$ can be defined as the conditional
-probability that they appear in questions together. Formally, $P(K_i
-\in K_q | K_j \in K_q)$ can be defined as:
-
-\begin{equation}
-  \label{eq:2}
-  \frac{\sum_{q \in Q} K_i \in K_q | K_j \in K_q}{\sum_{q \in Q} K_j \in K_q}
-\end{equation}
-
-\subsubsection{From proximity to specificity}
-\label{sec:from-prox-spec}
-
-Scoring tasks or skills as more or less specific requires that we
-translate from proximity between pairs of tasks or skills to a overall
-measure of specificity. Given a proximity matrix $P$ that contains the
-pairwise proximities $p_{i,j}$ between all technologies (skills) $T_i, T_j \in T_Q$, we may define the
-specificity of any technology (skill) $T_i$ as in equation \ref{eq:3}, where
-$\delta \in (0,1]$ is some threshold proximity value.
+User skill is thus defined as the quality of answers they provide to
+questions associated with specific skills. Each answer has a set of
+votes $V_A \in [0, \infty)$. We assign skill specialization to users
+as the skill-share-weighted sum of votes on answers to
+questions. Hence if a user answered the question described above (with
+a 50/50 skill split), their skill score for that question would be the
+total vote count for that answer, spilt 50/50 between two skill
+categories. Based on all user answers, then, we can aggregate a total
+skill score as the sum of skill scores for all questions the user has
+answered.  Formally, then, skill is defined as a vector $s_i \in S_U$:
 
 \begin{equation}
-  \label{eq:3}
-  ST_i = \sum_{q \in Q} p_{i,q} > \delta 
+  \label{eq:4}
+  s_i = \sum_{A_w, s} V_{A_w} * \alpha_{Q, s}
 \end{equation}
 
-Higher-valued $ST_i$ indicate skills that are more general, defined as
-applied in concert with a larger set of other skills. We can write the
-same relationship for task specificity $SK_i$.
+Where $\alpha_{Q,s}$ is the share of question $Q$ dealing with skill
+cluster $s$.
 
-\subsubsection{Task specificity and technological clustering}
-\label{sec:task-spec-techn}
+\subsubsection{IT worker skill specialization}
+\label{sec:it-worker-skill-1}
 
-Observers will note that some technologies (skills) are
-heirarchical. For instance, the \texttt{bash} shell scripting
-environment is a subset of the Unix operating system. Thus $P(unix |
-bash)$ will be close to 1. In aggregate, leaving this fact unaccounted
-for would simply reproduce heirarchies like this. To account for this
-problem, we take the minimum of the pairwise conditional probabilities
-for each skill or task pair. Thus while $P(Unix, bash)$ may be 1,
-$P(bash, Unix)$ will most likely be far smaller, reflecting the fact
-that only a portion of questions about Unix will inquire about the
-\texttt{bash} environment.
 
-\textbf{Alternatively}, we can view this heirarchy of technologies as
-a natural clustering of technology types. Bridges between the
-technology types consist of nodes describing tasks undertaken in
-either technology. Thus, for instance, we may
-observe a cluster of ``web technologies'' that are separate from
-``operating systems'' and ``machine control''. They may each be joined
-by a common node ``memory management''. Viewed in this fashion,
-users adopt skills in a technology cluster, rather than a set of atomistic
-technologies. A user's skill specificity is then measured as the number of
-clusters that he or she specializes in. 
+\section{Characterizing the selection problem}
+\label{sec:char-select-probl}
+
+We have no reason to believe that the Stackoverflow user population is
+particularly representative of the IT worker population at large. The
+question, then is, twofold:
+\begin{enumerate}
+\item Does the selection problem inhibit internal validity (comparison
+  among user groups within the user population)?
+\item How might users differ from non-users?
+\end{enumerate}
+
+We first provide comparative statics on the user population in general
+and across countries. 
+
+We first question whether linguistic ability shapes
+participation. Stackoverflow is an English-language website, which may
+limit participation from non-English-speaking populations. Conversely,
+IT is a largely English-dominated sector for historical reasons, and
+IT workers are generally highly educated. Figure \ref{} shows that the Anglo-Saxon and
+Scandinavian countries participate at higher per-capita rates than
+Continental Europe or other countries. However, figure \ref{} also
+shows that aggregate user reputatation--a measure of aggregate
+skill--does not appear to correlate with aggregate measures of
+English-speaking ability once we control for when users joined the
+user community. Hence while English ability (higher in Anglo-Saxon
+countries and Scandinavia) may affect selection into the user
+population, it does not appear to affect patterns of participation
+once in the user community. 
+
+We second ask whether we observe different rates of adoption among
+countries. Figure \ref{} provides some evidence that the early
+adopters are almost entirely English-speaking. But while the timing of
+adoption changes, we find evidence that patterns of adoption are quite
+similar. Figure \ref{} shows that, when we normalize the timing of
+adoption such that day 0 for all countries is the first day of user
+adoption for that country, adoption patterns follow a generally
+sigmoidal pattern with a similar curve shape for all countries and
+country groups. Moreover, the Scandinavian countries again are highly
+similar to the English-speaking economies, while the Continental
+European economies maintain lower, adoption rates but similar adoption
+patters at those rates.
+
+Third, we ask whether per-capita rates of participation differ
+substantially across countries. We only observe user skill to the
+extent that they contribute answers to questions posed by
+others. Substantial differences in per-capita participation rates
+may lead to observed skill differences that do not accurately reflect
+actual skill differences, but instead reflect participation rates
+among the user population. Figure \ref{} provides some evidence that
+the per-capita rate of answer contribution across countries is highly
+similar. 
+
+
+% This proximity matrix,
+% of dimension $T$, can be treated as a graph of nodes $T$ and edges
+% $t_i, t_j$. Based on this graph, we can construct skill families from
+% the clustering of nodes in the graph. We employ the MCL community
+% detection algorithm \citep{dongen2000} which operates very quickly on
+% large graphs with many verticies (28,000 in this case) and
+% edges. Inspection of the identified clusters indicates a high degree
+% of internal coherence. Appendix \ref{sec:mcl-cluster-examples}
+% provides several examples of the resulting clusters of tags. 
+
+% We may infer skill specificity from a question-and-answer site
+% like StackOverflow by analyzing the co-occurrance of technologies by
+% question. If questions about some technology often reference one or
+% many other technologies, we may infer that this technology is a more
+% \textit{general} technology than one for which questions ask about it
+% alone. Thus, for instance, the $C$ programming language is a
+% general-purpose technology used for everything from commercial
+% software development to scientific computing. In contrast, the
+% \textsc{scada} language is used predominately for control of
+% industrial machinery. 
+
+% To quantify this definition of specificity, we must first define the
+% relationship of technologies to each other. We can quantify this
+% relationship as the proximity between any two technologies in the
+% question space. Each question
+% $q_i, i \in [1...n]$ considers some technologies $T_q$, which are a subset of the entire set of technologies $T_Q$ considered in all
+% questions $Q$. The proximity between any two technologies $T_i$ and
+% $T_j$ $\in T_Q$ can be defined as the conditional
+% probability that they appear in questions together. Formally, $P(T_i
+% \in T_q | T_j \in T_q)$ can be defined as:
+
+% \begin{equation}
+%   \label{eq:1}
+%   p_{i,j} = \frac{\sum_{q \in Q} T_i \in T_q | T_j \in T_q}{\sum_{q \in Q} T_j \in T_q}
+% \end{equation}
+
+
+
+% \subsubsection{Task proximity}
+% \label{sec:task-specificity}
+
+% \textbf{Tasks} will refer to the application of
+% technologies. Consistent with the definition in equation \ref{eq:1},
+% we will begin to define task specificity by first defining task
+% proximity. Task proximity is the conditional probability of
+% co-occurrance of tasks in the question metadata. Thus, for instance, if questions regarding thread
+% optimization also deal with memory optimization, but rarely deal with
+% web page design, then we would regard thread and memory optimization
+% as more proximate tasks than thread optimization and web page design. Using the same notation as above, 
+
+% Each question
+% $q_i, i \in [1...n]$ considers some tasks $K_q$, which are a subset of the entire set of tasks $K_Q$ considered in all
+% questions $Q$. The proximity between any two tasks $K_i$ and
+% $K_j$ $\in K_Q$ can be defined as the conditional
+% probability that they appear in questions together. Formally, $P(K_i
+% \in K_q | K_j \in K_q)$ can be defined as:
+
+% \begin{equation}
+%   \label{eq:2}
+%   \frac{\sum_{q \in Q} K_i \in K_q | K_j \in K_q}{\sum_{q \in Q} K_j \in K_q}
+% \end{equation}
+
+% \subsubsection{From proximity to specificity}
+% \label{sec:from-prox-spec}
+
+% Scoring tasks or skills as more or less specific requires that we
+% translate from proximity between pairs of tasks or skills to a overall
+% measure of specificity. Given a proximity matrix $P$ that contains the
+% pairwise proximities $p_{i,j}$ between all technologies (skills) $T_i, T_j \in T_Q$, we may define the
+% specificity of any technology (skill) $T_i$ as in equation \ref{eq:3}, where
+% $\delta \in (0,1]$ is some threshold proximity value.
+
+% \begin{equation}
+%   \label{eq:3}
+%   ST_i = \sum_{q \in Q} p_{i,q} > \delta 
+% \end{equation}
+
+% Higher-valued $ST_i$ indicate skills that are more general, defined as
+% applied in concert with a larger set of other skills. We can write the
+% same relationship for task specificity $SK_i$.
+
+% \subsubsection{Task specificity and technological clustering}
+% \label{sec:task-spec-techn}
+
+% Observers will note that some technologies (skills) are
+% heirarchical. For instance, the \texttt{bash} shell scripting
+% environment is a subset of the Unix operating system. Thus $P(unix |
+% bash)$ will be close to 1. In aggregate, leaving this fact unaccounted
+% for would simply reproduce heirarchies like this. To account for this
+% problem, we take the minimum of the pairwise conditional probabilities
+% for each skill or task pair. Thus while $P(Unix, bash)$ may be 1,
+% $P(bash, Unix)$ will most likely be far smaller, reflecting the fact
+% that only a portion of questions about Unix will inquire about the
+% \texttt{bash} environment.
+
+% \textbf{Alternatively}, we can view this heirarchy of technologies as
+% a natural clustering of technology types. Bridges between the
+% technology types consist of nodes describing tasks undertaken in
+% either technology. Thus, for instance, we may
+% observe a cluster of ``web technologies'' that are separate from
+% ``operating systems'' and ``machine control''. They may each be joined
+% by a common node ``memory management''. Viewed in this fashion,
+% users adopt skills in a technology cluster, rather than a set of atomistic
+% technologies. A user's skill specificity is then measured as the number of
+% clusters that he or she specializes in. 
 
 \subsubsection{Individual-level skill and task specialization}
 \label{sec:indiv-level-skill}
@@ -423,6 +565,13 @@ artificial) distinction between tasks and skills.
 
 \section{Conclusions}
 \label{sec:conclusions}
+
+\appendix
+\appendixpage
+
+\section{MCL cluster examples}
+\label{sec:mcl-cluster-examples}
+
 
 
 \FloatBarrier
