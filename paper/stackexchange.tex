@@ -355,6 +355,7 @@ the per-capita rate of answer contribution across countries is highly
 similar. 
 
 
+
 % This proximity matrix,
 % of dimension $T$, can be treated as a graph of nodes $T$ and edges
 % $t_i, t_j$. Based on this graph, we can construct skill families from
@@ -461,99 +462,99 @@ similar.
 % technologies. A user's skill specificity is then measured as the number of
 % clusters that he or she specializes in. 
 
-\subsubsection{Individual-level skill and task specialization}
-\label{sec:indiv-level-skill}
+% \subsubsection{Individual-level skill and task specialization}
+% \label{sec:indiv-level-skill}
 
-Given these definitions of task and skill specificity, we can now
-define what we mean by those terms for any given individual. for a
-user $u \in U$, their skill specificity is the mean specificity in all
-questions $q \in Q$ that they have answered. Task specificity is
-defined the same way. Each user thus receives both a skill and a task
-specificity score. Conceptually, then, each user falls into one of
-four possible categories: tackling specific tasks with general skills,
-general tasks with general skills, specific tasks with specific
-skills, or specific tasks with general skills. Notice, here, however,
-that we are not bound by discrete categorization. Rather, we can
-measure both task and skill specialization as continuous quantities.
+% Given these definitions of task and skill specificity, we can now
+% define what we mean by those terms for any given individual. for a
+% user $u \in U$, their skill specificity is the mean specificity in all
+% questions $q \in Q$ that they have answered. Task specificity is
+% defined the same way. Each user thus receives both a skill and a task
+% specificity score. Conceptually, then, each user falls into one of
+% four possible categories: tackling specific tasks with general skills,
+% general tasks with general skills, specific tasks with specific
+% skills, or specific tasks with general skills. Notice, here, however,
+% that we are not bound by discrete categorization. Rather, we can
+% measure both task and skill specialization as continuous quantities.
 
-Using the alternative definition of task proximity, we can define
-specialization as the number of different technology clusters in which
-a given user displays expertise. This eliminates the (potentially
-artificial) distinction between tasks and skills.
+% Using the alternative definition of task proximity, we can define
+% specialization as the number of different technology clusters in which
+% a given user displays expertise. This eliminates the (potentially
+% artificial) distinction between tasks and skills.
 
-\subsection{Technical design}
-\label{sec:technical-design}
+% \subsection{Technical design}
+% \label{sec:technical-design}
 
-\subsubsection{Option 1: continuous measures of tasks and skills}
-\label{sec:option-1:-continuous}
+% \subsubsection{Option 1: continuous measures of tasks and skills}
+% \label{sec:option-1:-continuous}
 
-\begin{enumerate}
-\item For the full set of users $U$, select those with geo-coded
-  information in their profiles, $U_g$ (DONE)
-\item For $U_g$, disambiguate the geo-coded data (DONE, via the Yahoo
-  Placemaker service)
-\item For all questions $Q$, get two subsets of questions:
-  \begin{enumerate}
-  \item All questions for which the submitter and AT LEAST one
-    answerer are in $U_g$
-  \item All questions for which AT LEAST one answerer are in $U_g$
-  \end{enumerate}
-\item Get all tags $T$ in the question set $Q$. Subset for only those
-  tags $T^*$ that occur more than $N$ times in the dataset. Construct a
-  proximity matrix $M_{T^*}$ with the conditional probability of tag
-  co-occurrance as defined in equation \ref{eq:1}
-\item For all tags $T^*$, categorize as either skills or tasks
-\item For all users $U_g$, get all tags in all questions answered by
-  $U_g$ and the community-generated score of the answer. Compute the
-  weighted task and skill specificity measures as described in
-  equation \ref{eq:3} and section \ref{sec:indiv-level-skill}
-\end{enumerate}
+% \begin{enumerate}
+% \item For the full set of users $U$, select those with geo-coded
+%   information in their profiles, $U_g$ (DONE)
+% \item For $U_g$, disambiguate the geo-coded data (DONE, via the Yahoo
+%   Placemaker service)
+% \item For all questions $Q$, get two subsets of questions:
+%   \begin{enumerate}
+%   \item All questions for which the submitter and AT LEAST one
+%     answerer are in $U_g$
+%   \item All questions for which AT LEAST one answerer are in $U_g$
+%   \end{enumerate}
+% \item Get all tags $T$ in the question set $Q$. Subset for only those
+%   tags $T^*$ that occur more than $N$ times in the dataset. Construct a
+%   proximity matrix $M_{T^*}$ with the conditional probability of tag
+%   co-occurrance as defined in equation \ref{eq:1}
+% \item For all tags $T^*$, categorize as either skills or tasks
+% \item For all users $U_g$, get all tags in all questions answered by
+%   $U_g$ and the community-generated score of the answer. Compute the
+%   weighted task and skill specificity measures as described in
+%   equation \ref{eq:3} and section \ref{sec:indiv-level-skill}
+% \end{enumerate}
 
-\subsubsection{Option 2: clusters of tags}
-\label{sec:option-2:-clusters}
+% \subsubsection{Option 2: clusters of tags}
+% \label{sec:option-2:-clusters}
 
-\begin{enumerate}
-\item Get the users and tags as described in section \ref{sec:option-1:-continuous}.
-\item For tags $T$, construct the graph $G_t$ of tags wherein each tag is a
-  node and the edges are defined as the conditional probability of
-  co-occurrance. Only use edges for which $p > threshold$.
-\item For $G_t$, find the graph k-cores (see
-  \url{http://networkx.lanl.gov/reference/algorithms.core.html} and
-  associated references).
-\item For each k-core, get the tags associated with it
-\item For each user $U_g$, determine which tags $T' \in T^*$ apply to
-  their answers
-\item Count the number of tags they answer, in the number of k-cores,
-  for each user in $U_g$
-\end{enumerate}
+% \begin{enumerate}
+% \item Get the users and tags as described in section \ref{sec:option-1:-continuous}.
+% \item For tags $T$, construct the graph $G_t$ of tags wherein each tag is a
+%   node and the edges are defined as the conditional probability of
+%   co-occurrance. Only use edges for which $p > threshold$.
+% \item For $G_t$, find the graph k-cores (see
+%   \url{http://networkx.lanl.gov/reference/algorithms.core.html} and
+%   associated references).
+% \item For each k-core, get the tags associated with it
+% \item For each user $U_g$, determine which tags $T' \in T^*$ apply to
+%   their answers
+% \item Count the number of tags they answer, in the number of k-cores,
+%   for each user in $U_g$
+% \end{enumerate}
 
-\section{Hypotheses}
-\label{sec:hypotheses}
+% \section{Hypotheses}
+% \label{sec:hypotheses}
 
-\subsection{Approach 1: continuous measures}
-\label{sec:appr-1:-cont}
+% \subsection{Approach 1: continuous measures}
+% \label{sec:appr-1:-cont}
 
-\begin{description}
-\item[H1] Users from CME countries will have higher mean specificity,
-  but in fewer skills or tasks (i.e., will display strong but
-  relatively narrow expertise)
-\item[H2] Users from LME countries will have lower mean specificity
-  scores, but will display expertise in more skills or tasks (i.e.,
-  will display weaker but broader expertise)
-\end{description}
+% \begin{description}
+% \item[H1] Users from CME countries will have higher mean specificity,
+%   but in fewer skills or tasks (i.e., will display strong but
+%   relatively narrow expertise)
+% \item[H2] Users from LME countries will have lower mean specificity
+%   scores, but will display expertise in more skills or tasks (i.e.,
+%   will display weaker but broader expertise)
+% \end{description}
 
-\subsection{Approach 2: clustered measures}
-\label{sec:appr-2:-clust}
+% \subsection{Approach 2: clustered measures}
+% \label{sec:appr-2:-clust}
 
-\begin{description}
-\item[H1] Users from LME countries will display expertise in more
-  technology ``clusters'' than users from CME countries. This is
-  equivalent to saying that LME users will have a more general skill
-  set, as a function of more liquid labor markets.
-\item[H2] Users from CME countries will display expertise in more tags
-  in any given cluster than users from LME countries, even if they are
-  present in fewer technology clusters
-\end{description}
+% \begin{description}
+% \item[H1] Users from LME countries will display expertise in more
+%   technology ``clusters'' than users from CME countries. This is
+%   equivalent to saying that LME users will have a more general skill
+%   set, as a function of more liquid labor markets.
+% \item[H2] Users from CME countries will display expertise in more tags
+%   in any given cluster than users from LME countries, even if they are
+%   present in fewer technology clusters
+% \end{description}
 
 
 
