@@ -46,6 +46,14 @@ survey$lan.c.. <- NULL
 survey$lan.perl <- NULL
 survey$lan.html5 <- NULL
 
+#reorder levels of compensation
+survey$compensation <- factor(survey$compensation,levels=c("<20k","20-40k",
+                                                          "40-60k","60-80k",
+                                                          "80-100k","100-120k",
+                                                          "120-140k",">140k",
+                                                          "NA","NoS","St/U"
+                                                      ))
+
 #add user id
 survey$user.id <- c(1:nrow(survey))
 
@@ -228,7 +236,9 @@ print(plot.rep.region)
 
 #plot compensation histogram by region
 
-plot.comp.region <- ggplot(survey.new,
+par(mfrow=c(10,10))
+
+plot.comp.region <- ggplot(survey.new[survey.new$experience=="<2",],
                           aes(x=compensation)
                           )+
                             geom_histogram()+
@@ -239,6 +249,61 @@ plot.comp.region <- ggplot(survey.new,
                                  )+labs(x="compensation")
 print(plot.comp.region)
 
+plot.comp.region <- ggplot(survey.new[survey.new$experience=="2-5",],
+                           aes(x=compensation)
+                           )+
+                             geom_histogram()+
+                             facet_wrap(~region,scales="free_y")+
+                             opts(title="Survey user compensation histogram by region",
+                                  axis.text.x=theme_text(
+                                    angle=90,hjust=1,size=6)
+                                  )+labs(x="compensation")
+print(plot.comp.region)
+
+plot.comp.region <- ggplot(survey.new[survey.new$experience=="6-10",],
+                           aes(x=compensation)
+                           )+
+                             geom_histogram()+
+                             facet_wrap(~region,scales="free_y")+
+                             opts(title="Survey user compensation histogram by region",
+                                  axis.text.x=theme_text(
+                                    angle=90,hjust=1,size=6)
+                                  )+labs(x="compensation")
+print(plot.comp.region)
+
+plot.comp.region <- ggplot(survey.new[survey.new$experience==">11",],
+                           aes(x=compensation)
+                           )+
+                             geom_histogram()+
+                             facet_wrap(~region,scales="free_y")+
+                             opts(title="Survey user compensation histogram by region",
+                                  axis.text.x=theme_text(
+                                    angle=90,hjust=1,size=6)
+                                  )+labs(x="compensation")
+print(plot.comp.region)
+
+plot.comp.region <- ggplot(survey.new[survey.new$experience=="#N/A",],
+                           aes(x=compensation)
+                           )+
+                             geom_histogram()+
+                             facet_wrap(~region,scales="free_y")+
+                             opts(title="Survey user compensation histogram by region",
+                                  axis.text.x=theme_text(
+                                    angle=90,hjust=1,size=6)
+                                  )+labs(x="compensation")
+print(plot.comp.region)
+
+plot.comp.region.ex <- ggplot(survey.new,
+                           aes(x=compensation)
+                           )+
+                             geom_histogram()+
+                             facet_wrap(~experience, scales='free_y')+
+                             facet_wrap(~region,scales='free_y')+
+                             opts(title="Survey user compensation histogram by region",
+                                  axis.text.x=theme_text(
+                                    angle=90,hjust=1,size=6)
+                                  )+labs(x="compensation")
+print(plot.comp.region.ex)
 
 #plot occupation distribution
 
@@ -252,3 +317,121 @@ plot.occupation.region <- ggplot(survey,
                                           angle=90,hjust=1,size=6)
                                         )+labs(x="occupation")
 print(plot.occupation.region)
+
+
+
+## test to see if the distribution of compensation depend on experience
+
+
+plot.comp.region.by.ex1<-ggplot(survey.new[survey.new$experience=="<2",],
+                           aes(x=compensation)
+                           )+
+                             geom_histogram()+
+                             facet_wrap(~region,scales="free_y")+
+                             opts(title="Survey user compensation histogram by region, with experience < 2 years",
+                                  axis.text.x=theme_text(
+                                    angle=90,hjust=1,size=6)
+                                  )+labs(x="compensation")
+
+print(plot.comp.region.by.ex1)
+
+
+plot.comp.region.by.ex2<-ggplot(survey.new[survey.new$experience=="2-5",],
+                           aes(x=compensation)
+                           )+
+                             geom_histogram()+
+                             facet_wrap(~region,scales="free_y")+
+                             opts(title="Survey user compensation histogram by region, with experience 2-5 years",
+                                  axis.text.x=theme_text(
+                                    angle=90,hjust=1,size=6)
+                                  )+labs(x="compensation")
+print(plot.comp.region.by.ex2)
+
+plot.comp.region.by.ex3 <- ggplot(survey.new[survey.new$experience=="6-10",],
+                           aes(x=compensation)
+                           )+
+                             geom_histogram()+
+                             facet_wrap(~region,scales="free_y")+
+                             opts(title="Survey user compensation histogram by region, with experience 6-10 years",
+                                  axis.text.x=theme_text(
+                                    angle=90,hjust=1,size=6)
+                                  )+labs(x="compensation")
+print(plot.comp.region.by.ex3)
+
+plot.comp.region.by.ex4<-ggplot(survey.new[survey.new$experience==">11",],
+                           aes(x=compensation)
+                           )+
+                             geom_histogram()+
+                             facet_wrap(~region,scales="free_y")+
+                             opts(title="Survey user compensation histogram by region, with experience > 11 years",
+                                  axis.text.x=theme_text(
+                                    angle=90,hjust=1,size=6)
+                                  )+labs(x="compensation")
+print(plot.comp.region.by.ex4)
+
+plot.comp.region.by.ex5<-ggplot(survey.new[survey.new$experience=="#N/A",],
+                           aes(x=compensation)
+                           )+
+                             geom_histogram()+
+                             facet_wrap(~region,scales="free_y")+
+                             opts(title="Survey user compensation histogram by region, with experience of years unknown",
+                                  axis.text.x=theme_text(
+                                    angle=90,hjust=1,size=6)
+                                  )+labs(x="compensation")
+print(plot.comp.region.by.ex5)
+
+## test to see if the distribution of compensation depend on reputation
+
+
+plot.comp.region.by.rep1<-ggplot(survey.new[survey.new$rep=="1",],
+                                aes(x=compensation)
+                                )+
+                                  geom_histogram()+
+                                  facet_wrap(~region,scales="free_y")+
+                                  opts(title="Survey user compensation histogram by region, with reputation = 1",
+                                       axis.text.x=theme_text(
+                                         angle=90,hjust=1,size=6)
+                                       )+labs(x="compensation")
+
+print(plot.comp.region.by.rep1)
+
+range2 <- c("50","100","200","500")
+
+plot.comp.region.by.rep2<-ggplot(survey.new[survey.new$rep %in% range2,],
+                                aes(x=compensation)
+                                )+
+                                  geom_histogram()+
+                                  facet_wrap(~region,scales="free_y")+
+                                  opts(title="Survey user compensation histogram by region, with reputation [50,500]",
+                                       axis.text.x=theme_text(
+                                         angle=90,hjust=1,size=6)
+                                       )+labs(x="compensation")
+print(plot.comp.region.by.rep2)
+
+range3 <- c("1000","2000","3000")
+
+plot.comp.region.by.rep3 <- ggplot(survey.new[survey.new$rep %in% range3,],
+                                  aes(x=compensation)
+                                  )+
+                                    geom_histogram()+
+                                    facet_wrap(~region,scales="free_y")+
+                                    opts(title="Survey user compensation histogram by region, with reputation [1000,3000]",
+                                         axis.text.x=theme_text(
+                                           angle=90,hjust=1,size=6)
+                                         )+labs(x="compensation")
+print(plot.comp.region.by.rep3)
+
+range4 <- c("5000","10000")
+
+plot.comp.region.by.rep4<-ggplot(survey.new[survey.new$rep %in% range4,],
+                                aes(x=compensation)
+                                )+
+                                  geom_histogram()+
+                                  facet_wrap(~region,scales="free_y")+
+                                  opts(title="Survey user compensation histogram by region, with reputation [5000,10000]",
+                                       axis.text.x=theme_text(
+                                         angle=90,hjust=1,size=6)
+                                       )+labs(x="compensation")
+print(plot.comp.region.by.rep4)
+
+
