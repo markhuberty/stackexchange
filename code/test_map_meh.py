@@ -39,7 +39,7 @@ user_skill_map = {}
 for i, q in enumerate(question_answer_vote['question_id']):
     if i % 10000 is 0:
         print i
-        this_record = question_answer_vote.ix[i]
+    this_record = question_answer_vote.ix[i]
     this_user = this_record['answer_user_id']
     if not user_skill_map.has_key(this_user):
         user_skill_map[this_user] = {}            
