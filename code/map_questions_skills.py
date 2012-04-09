@@ -36,7 +36,7 @@ def map_q_skill(questions, tags, skills):
         for i, s in enumerate(skills):
             #print i
             temp = list(set(q_tags) & set(s))
-            prop_s = len(temp) / float(len(q_tags))
+            prop_s = len(temp) /x float(len(q_tags))
             if prop_s > 0:
                 this_s.append(i)
                 this_s_prop.append(prop_s)
