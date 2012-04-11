@@ -1,3 +1,7 @@
+#For each contry, count how many user accounts were created per month. Then group 
+#countries by English speaking, non-English speaking, and other Countries. 
+#Rescaled user add counts against maximum record of user add per month, as well as against total labor
+
 library(reshape)
 library(foreach)
 library(stringr)
@@ -140,6 +144,8 @@ count.user<- function(user.sub){
    count.user.sub.country$country.code <- country.names[i]
    names(count.user.sub.country)<-c("creation.date","user.add","country.code")
    #normalize dates
+   count.user.sub.country$creation.date <- as.numeric(levels(count.user.sub.country$creation.date[
+     count.user.sub.country$creation.date]))
    count.user.sub.country$min.date <- min(count.user.sub.country$creation.date)
    count.user.sub.country$normal.creation.date <- count.user.sub.country$creation.date -
    count.user.sub.country$min.date
@@ -298,6 +304,8 @@ plot3 <- ggplot(count.user.sub.group,
 
 print(plot3)
 
+
+
 #smoothing curve
 
 plot31 <- ggplot(count.user.sub.group,
@@ -315,6 +323,8 @@ plot31 <- ggplot(count.user.sub.group,
 
 print(plot31)
 
+pdf(file="C:/Users/miaomiaocui/stackexchange/figures/new/user_add_per_labor_region.pdf")
+
 #smoothing scale by dividing each point by max
 
 plot41 <- ggplot(count.user.sub.group,
@@ -328,24 +338,9 @@ plot41 <- ggplot(count.user.sub.group,
                             axis.text.x=theme_text(
                               angle=90, hjust=1, size=6)) +
                                 labs(x="Normalized creation date divided into 30 bins",
-                                     y="Monthly added users per labor/max added user")
+                                     y="Monthly added users/max added user")
 
 print(plot41)
 
-
-
-plot31 <- ggplot(count.user.sub.group,
-                aes(x=normalized.creation.month,
-                    y=log10(tapply(count.user.sub.group$user.add.per.labor.month,
-                                   count.user.sub.group$region,
-                                   mean)),
-                    color=region))+
-                      geom_line()+
-                      opts(title="Monthly added users per labor, by region",
-                           axis.text.x=theme_text(
-                             angle=90, hjust=1, size=6))+
-                               labs(x="Normalized creation date divided into 30 bins",
-                                    y="Log10 (Monthly added users per labor)")
-
-print(plot31) 
+pdf(file="C:/Users/miaomiaocui/stackexchange/figures/new/user_add_over_max_region.pdf")
 

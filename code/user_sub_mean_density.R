@@ -1,3 +1,7 @@
+## Filter users from countries that we care about
+## Plot mean and median with 95% CI for reputation, up/down votes, creation/last access dates, and time between two dates
+## Plot densities for these varialbes for high rep user subgroup (rep >1) and all users
+
 library(reshape)
 library(foreach)
 library(stringr)
@@ -14,6 +18,27 @@ user <-
 user$Location <-NULL
 user$Id <- NULL
 user$DisplayName <- NULL
+
+#format date
+format.date <- function(d){
+  d<- str_split(d,"T")
+  d<- sapply(d,function(x){x[[1]][1]})
+  d<- as.Date(d)
+  return(d)
+}
+
+access.date <- format.date(user$LastAccessDate)
+creation.date <- format.date(user$CreationDate)
+user$LastAccD <- access.date
+user$CreatD <- creation.date
+
+user$duration <- as.integer(difftime(user$LastAccD,
+                                         user$CreatD,
+                                         units="days")
+                                )
+
+write.csv(user,file="C:/Users/miaomiaocui/Documents/teSt/stackexchange/data/user.csv",row.names=FALSE)
+
 
 #take out uninteresting countries
 country.sub <- c("AU",
@@ -58,6 +83,7 @@ country.sub <- c("AU",
 
 user.sub <- drop.levels(user[user$country.code%in% country.sub,])
 
+write.csv(user.sub,file="C:/Users/miaomiaocui/Documents/teSt/stackexchange/data/user.sub.csv",row.names=FALSE)
 
 
 
@@ -67,22 +93,6 @@ user.sub.mean.web <- data.frame(tapply(user.sub$web.binary,user.sub$country.code
 
 #calculate duration
 
-format.date <- function(d){
-  d<- str_split(d,"T")
-  d<- sapply(d,function(x){x[[1]][1]})
-  d<- as.Date(d)
-  return(d)
-}
-
-access.date <- format.date(user.sub$LastAccessDate)
-creation.date <- format.date(user.sub$CreationDate)
-user.sub$LastAccD <- access.date
-user.sub$CreatD <- creation.date
-
-user.sub$duration <- as.integer(difftime(user.sub$LastAccD,
-                                         user.sub$CreatD,
-                                         units="days")
-                                )
 
 #calculate mean,med and 95% CI
 

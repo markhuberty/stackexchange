@@ -1,3 +1,5 @@
+#pairwise two-tailed t-tests with significance 0.1 by country
+
 library(reshape)
 library(foreach)
 library(stringr)

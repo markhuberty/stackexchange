@@ -1,3 +1,5 @@
+#calculated SO user to patent, labor, capital, ICT (braod and narrow definition) ratios by country
+
 library(reshape)
 library(foreach)
 library(stringr)
@@ -68,7 +70,7 @@ user.sub.ratio$user.to.patent <- user.sub.ratio$user.counts/user.sub.ratio$paten
 #remove missing values
 user.sub.ratio <- na.omit(user.sub.ratio)
 
-#plot
+#plot user to patent, ict labor, capita ratios
 
 plot.user.patent<-ggplot(drop.levels(user.sub.ratio),
                          aes(x=country.code,
@@ -76,7 +78,7 @@ plot.user.patent<-ggplot(drop.levels(user.sub.ratio),
                                geom_point()+
                                opts(title="User per triadic patent by country",
                                     axis.text.x=theme_text(size=6))+
-                                      labs(x="Countries",y="User/patent")
+                                      labs(x="countries",y="User/patent")
                                
                                 
 print(plot.user.patent)
@@ -87,7 +89,7 @@ plot.user.total <- ggplot(drop.levels(user.sub.ratio),
                                 geom_point()+
                                 opts(title="User per capita by country",
                                      axis.text.x=theme_text(size=6))+
-                                       labs(x="Countries",y="User/capita")
+                                       labs(x="countries",y="User/capita")
 print(plot.user.total)
 
 plot.user.broad <- ggplot(drop.levels(user.sub.ratio),
@@ -96,7 +98,7 @@ plot.user.broad <- ggplot(drop.levels(user.sub.ratio),
                                 geom_point()+
                                 opts(title="User per thousand ICT labor (broad definition) by country",
                                      axis.text.x=theme_text(size=6))+
-                                       labs(x="Countries",y="User/broad ICT labor (000)")
+                                       labs(x="countries",y="User/broad ICT labor (000)")
 print(plot.user.broad)
 
 plot.user.narrow <- ggplot(user.sub.ratio,
@@ -105,7 +107,7 @@ plot.user.narrow <- ggplot(user.sub.ratio,
                                 geom_point()+
                                 opts(title="User per thousand ICT labor (narrow definition) by country",
                                      axis.text.x=theme_text(size=6))+
-                                       labs(x="Countries",y="User/narrow ICT labor (000)")
+                                       labs(x="countries",y="User/narrow ICT labor (000)")
 print(plot.user.narrow)
 
 #check if narrow and broad ICT labor follow some linear relationship across countries
@@ -115,7 +117,7 @@ plot.narrow.broad <- ggplot(drop.levels(new.labor),
                                   geom_point()+
                                   opts(title="Narrow def. ICT labor as a share of broad def. ICT labor",
                                        axis.text.x=theme_text(size=6))+
-                                         labs(x="Countries",y="Share")
+                                         labs(x="countries",y="Share")
 print(plot.narrow.broad)
 
 #export
