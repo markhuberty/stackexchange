@@ -1,3 +1,5 @@
+#pairwise ks-test
+
 library(reshape)
 library(foreach)
 library(stringr)
@@ -5,7 +7,7 @@ library(ggplot2)
 library(Hmisc)
 library(gdata)
 
-#pairwise t-test
+#write pairwise ks-test function
 
 compute.pairwise.ks <- function(variable,factor){
   unique.factor <- levels(factor)
