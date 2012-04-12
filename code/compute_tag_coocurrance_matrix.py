@@ -46,14 +46,12 @@ tag_matrix_multiply = tag_matrix_multiply.asfptype()
 
 
 ## Divide out the colsums to get the conditional probability of 
-## co-incidence
-row_indices, col_indices = tag_matrix_multiply.nonzero()
-tag_frequencies = [tag_frequency[i] for i in col_indices]
-
-
+## co-incidence. First strip out the diagonal.
 to_keep = [idx for idx, r in enumerate(row_indices) if row_indices[idx] != col_indices[idx]]
 row_indices = [row_indices[idx] for idx in to_keep]
 col_indices = [col_indices[idx] for idx in to_keep]
+row_indices, col_indices = tag_matrix_multiply.nonzero()
+tag_frequencies = [tag_frequency[i] for i in col_indices]
 
 
 for d in range(len(tag_matrix_multiply.data)):
@@ -66,28 +64,18 @@ filename='../data/tag_proximity_csc.pickle'
 with open(filename, 'wt') as f:
     pickle.dump(tag_matrix_multiply, f)
 
-## Way too slow...
-# ## Now take the pairwise minima
-# prox_minima = []
-# for i in range(len(unique_tags)):
-#     for j in range(i+1, len(unique_tags)):
-#         if i is not j:
-#             val_a = tag_matrix_multiply[i,j]
-#             val_b = tag_matrix_multiply[j,i]
-#             if val_a > val_b:
-#                 prox_minima.append((i,j, val_b))
-#             else:
-#                 prox_minima.append((j,i, val_a))
-    
 
 ## Create the nx graph and add the top tags as nodes
 g_tag = nx.Graph()
 
 ## Then add the edges as weights
 ## Takes the max values
-edges = [(unique_tags[r], unique_tags[c], 1-tag_matrix_multiply[r,c])
+## Add a small value to each edgeweight to make sure that even
+## 0-proximity edges have some weight.
+eps = 0.00001
+edges = [(unique_tags[r], unique_tags[c], 1-tag_matrix_multiply[r,c] + eps)
          if tag_matrix_multiply[r,c] > tag_matrix_multiply[c,r] else
-         (unique_tags[c], unique_tags[r], 1-tag_matrix_multiply[c,r])
+         (unique_tags[c], unique_tags[r], 1-tag_matrix_multiply[c,r] + eps)
          for r, c in zip(row_indices, col_indices) 
          ]
 edgeweights = [e[2] for e in edges]
@@ -119,6 +107,7 @@ def write_mcl_format(g, filename):
 
 write_mcl_format(g_tag, '../data/g_tag_mcl.txt')
 
+tag_betweenness = nx.betweenness_centrality(g_tag)
 
 ## And generate the MST w/ Kruskal's alg
 mst = nx.minimum_spanning_tree(g_tag)
