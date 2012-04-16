@@ -38,7 +38,7 @@ conn_cursor.close()
 conn.close()
 ## End data read-in
 
-conn = open('C:/Users/miaomiaocui/stackexchange/data/question_answer_flow.csv', 'wt')
+conn = open('../data/question_answer_flow.csv', 'wt')
 writer = csv.writer(conn)
 writer.writerow(['question_user_location','answer_user_location','question_user_rep',
                  'answer_user_rep','question_id','question_userid','answer_id','answer_userid','vote_type_vote_count'])
