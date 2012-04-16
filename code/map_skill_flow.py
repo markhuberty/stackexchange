@@ -23,7 +23,7 @@ conn_cursor = conn.cursor()
 
 conn_cursor.execute("""SELECT qu.LOCATION as q_u_location,au.LOCATION as a_u_LOCATION,qu.REPUTATION as
 q_u_rep, au.REPUTATION as a_u_rep, q.ID as question_id, q.OWNERUSERID as question_user,
-a.ID as answer_id, a.OWNERUSERID as answer_user, v.VOTETYPE as vote_type, count(*) as vote_coount
+a.ID as answer_id, a.OWNERUSERID as answer_user, v.VOTETYPEID as vote_type, count(*) as vote_coount
 FROM posts q INNER JOIN posts a
 ON q.ID=a.PARENTID and a.POSTTYPEID=2
 INNER JOIN votes v ON v.POSTID=a.ID and v.VOTETYPEID IN (1,2,3)
