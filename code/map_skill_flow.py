@@ -41,7 +41,8 @@ conn.close()
 conn = open('../data/question_answer_flow.csv', 'wt')
 writer = csv.writer(conn)
 writer.writerow(['question_user_location','answer_user_location','question_user_rep',
-                 'answer_user_rep','question_id','question_userid','answer_id','answer_userid','vote_type_vote_count'])
+                 'answer_user_rep','question_id','question_userid','answer_id',
+                 'answer_userid','vote_type','vote_count'])
 for r in flow_data:
     writer.writerow(list(r))
 conn.close()
