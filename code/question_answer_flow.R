@@ -94,58 +94,84 @@ user.flow.sub <- drop.levels(user.flow[user.flow$question.country
 user.flow.sub <- drop.levels(user.flow.sub[user.flow.sub$answer.country
                                        %in% country.sub,])
 
-#drop votetype = 1 because it indicates that the answer is accepted by the person who asked.
-user.flow.sub.total<-drop.levels(user.flow.sub[user.flow.sub$vote.type!=1,])
+#only keep votetype = 1 because it indicates that the answer is accepted by the person who asked.
+user.flow.sub.acc<-drop.levels(user.flow.sub[user.flow.sub$vote.type==1,])
 
 #count the frequency of country pairs by (question, ansewr)
-user.flow.sub.count<-data.frame(ftable(user.flow.sub.total$question.country,user.flow.sub.total$answer.country))
-names(user.flow.sub.count)<- c("question.country","answer.country","flow.frequency")
+user.flow.sub.acc.count<-data.frame(ftable(user.flow.sub.acc$question.country,user.flow.sub.acc$answer.country))
+names(user.flow.sub.acc.count)<- c("question.country","answer.country","flow.frequency")
 
 #break frequency by quantile
-user.flow.sub.count$freq.quantiles <- cut(user.flow.sub.count$flow.frequency,
-                                      breaks=c(-0.01,2,12,52,66170))
+user.flow.sub.acc.count$freq.quantiles <- cut(user.flow.sub.acc.count$flow.frequency,
+                                      breaks=c(-0.01,1,4,15,59,22070))
 #plotting tile
-q.a.flow <- ggplot(user.flow.sub.count,
+q.a.flow <- ggplot(user.flow.sub.acc.count,
                aes(x=question.country,
                    y=answer.country))+geom_tile(aes(fill=freq.quantiles))+
-                     opts(title="Flow of knowledge, regardless of quality of answers",
+                     opts(title="Flow of knowledge, measured by the amount of accepted answers",
                           axis.text.x=theme_text(size=6))
 print(q.a.flow)
 
-pdf(file="C:/Users/miaomiaocui/stackexchange/figures/q_a_unweighted_flow")
+pdf(file="C:/Users/miaomiaocui/stackexchange/figures/q_a_knowledge_flow")
 
-#weigh by votetype
+#weigh counts by country
+user.question.country <- aggregate(user.flow.sub.acc.count$flow.frequency,
+                                   by=list(user.flow.sub.acc.count$question.country),"sum")
 
-#seperate by vote types
-user.flow.sub.acc<-drop.levels(user.flow.sub[user.flow.sub$vote.type==1,])
-user.flow.sub.up<-drop.levels(user.flow.sub[user.flow.sub$vote.type==2,])
-user.flow.sub.dn<-drop.levels(user.flow.sub[user.flow.sub$vote.type==3,])
+names(user.question.country)<- c("question.country","total.questions.asked.by.q.country")
 
-#count country pairs seperately for each vote type
-user.flow.sub.acc.count<-data.frame(ftable(user.flow.sub.acc$question.country,
-                                           user.flow.sub.acc$answer.country))
-user.flow.sub.up.count<-data.frame(ftable(user.flow.sub.up$question.country,
-                                          user.flow.sub.up$answer.country))
-user.flow.sub.dn.count<-data.frame(ftable(user.flow.sub.dn$question.country,
-                                          user.flow.sub.dn$answer.country))
+#merge into the original count
 
-#weighted frequency, for each country pair, 
-#frequency = amount of upvoted answers-amount of downvoted answers
-user.flow.sub.w.count <- data.frame(user.flow.sub.acc.count$Var1,
-                                    user.flow.sub.acc.count$Var2)
-user.flow.sub.w.count$freq <- user.flow.sub.up.count$Freq - user.flow.sub.dn.count$Freq
+user.flow.sub.acc.count <- merge(user.flow.sub.acc.count,
+                                 user.question.country,
+                                 by="question.country",
+                                 all=FALSE)
 
-names(user.flow.sub.w.count) <- c("question.country","answer.country","weighted.flow.frequency")
+#ratio of questions answered by countries
+user.flow.sub.acc.count$weight.by.answer.country <- 
+  user.flow.sub.acc.count$flow.frequency/user.flow.sub.acc.count$total.questions.asked.by.q.country
 
-#plot weighted frequency
-user.flow.sub.w.count$freq.quantiles <- cut(user.flow.sub.w.count$weighted.flow.frequency,
-                                          breaks=c(-1.1,2,9,40,51080))
-#plotting tile
-q.a.w.flow <- ggplot(user.flow.sub.w.count,
-                   aes(x=question.country,
-                       y=answer.country))+geom_tile(aes(fill=freq.quantiles))+
-                         opts(title="Weighted flow of knowledge, upvoted answers-downvoted answers",
-                              axis.text.x=theme_text(size=6))
-print(q.a.w.flow)
+#weigh by overall flow
+user.flow.sub.acc.count$total.answers <- sum(user.flow.sub.acc.count$flow.frequency)
+user.flow.sub.acc.count$weight.by.total.answers <- 
+  user.flow.sub.acc.count$flow.frequency/user.flow.sub.acc.count$total.answers
 
-pdf(file="C:/Users/miaomiaocui/stackexchange/figures/q_a_weighted_flow")
+#take out zeros
+user.flow.sub.acc.count <- drop.levels(
+  user.flow.sub.acc.count[user.flow.sub.acc.count$weight.by.answer.country
+                                                               !=0,])
+user.flow.sub.acc.count <- drop.levels(
+  user.flow.sub.acc.count[user.flow.sub.acc.count$weight.by.total.answers
+                          !=0,])
+
+#graphing nodes and vector edges
+library(igraph)
+
+user.flow.acc.count.weight.a <- data.frame(user.flow.sub.acc.count$question.country,
+                                           user.flow.sub.acc.count$answer.country,
+                                           1/user.flow.sub.acc.count$weight.by.answer.country)
+names(user.flow.acc.count.weight.a) <- c("question.country","answer.country","inverse.weight.by.answer.country")
+
+#generate edges (question flow) and vertices (countries)
+acc.count.weight.a.flow <- graph.data.frame(user.flow.acc.count.weight.a,
+                                            directed=TRUE,vertices=NULL)
+E(acc.count.weight.a.flow)$weight <- 1/user.flow.sub.acc.count$weight.by.answer.country
+
+#generate minimum spanning tree, and the weight is 1/weight.by.answer.country
+test <- minimum.spanning.tree(acc.count.weight.a.flow)
+
+test2 <- add.edges(test,
+                   E(acc.count.weight.a.flow)[E(acc.count.weight.a.flow)$weight<10&&
+                     E(acc.count.weight.a.flow)$weight>max(E(test)$weight)])
+
+test2.flow<- plot.igraph(test2,layout=layout.fruchterman.reingold, vertex.color="gray60", 
+     vertex.label= V(acc.count.weight.a.flow)$name,
+     edge.arrow.size = 0.1, edge.color = "gray80")
+
+
+#add back some vertices
+add.vertices <- user.flow.acc.count.weight.a$question.country[user.flow.acc.count.weight.a$inverse.weight.by.answer.country<
+  mean(user.flow.acc.count.weight.a$inverse.weight.by.answer.country)]
+
+
+
