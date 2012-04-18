@@ -1,4 +1,29 @@
-#Counts the frequency of country pairs of which user ask and answer questions
+# First Step:
+#Obtain flow of answers and questions among users
+#Only consider answers that are accepted by questioner (votetype=1)
+
+# Second Step:the heatmap
+#Counts the information exchange betwee country pairs 
+#Assign quantiles to the counts and plot heatmap
+
+
+# Third Step: the network graph
+#Plot network graphs that contain the following information:
+#nodes: countries that only include CME, LME and SCAND
+#edges: directed, from countries that ask question to those that answer
+
+#weight type 1 --- reflects bilateral relationship: 
+#             edge weight between (A,B) = 
+#             questions asked by country A that got answered by country B/total questions asked by country A
+
+#weight type 2 --- reflects countries' overall influences:
+#             edge weight between (A,B) =
+#             questions asked by country A that got answered by country B/total questions asked by all countries
+
+#graphs only display edges with weight above the 75-percentile
+
+#THEN among the edges that ARE displayed, three colors are assigned to partition these edges.
+
 
 library(reshape)
 library(foreach)
@@ -144,34 +169,122 @@ user.flow.sub.acc.count <- drop.levels(
   user.flow.sub.acc.count[user.flow.sub.acc.count$weight.by.total.answers
                           !=0,])
 
-#graphing nodes and vector edges
+#graphing nodes and vector edges for weights by answering country
 library(igraph)
 
 user.flow.acc.count.weight.a <- data.frame(user.flow.sub.acc.count$question.country,
                                            user.flow.sub.acc.count$answer.country,
-                                           1/user.flow.sub.acc.count$weight.by.answer.country)
-names(user.flow.acc.count.weight.a) <- c("question.country","answer.country","inverse.weight.by.answer.country")
-
-#generate edges (question flow) and vertices (countries)
-acc.count.weight.a.flow <- graph.data.frame(user.flow.acc.count.weight.a,
-                                            directed=TRUE,vertices=NULL)
-E(acc.count.weight.a.flow)$weight <- 1/user.flow.sub.acc.count$weight.by.answer.country
-
-#generate minimum spanning tree, and the weight is 1/weight.by.answer.country
-test <- minimum.spanning.tree(acc.count.weight.a.flow)
-
-test2 <- add.edges(test,
-                   E(acc.count.weight.a.flow)[E(acc.count.weight.a.flow)$weight<10&&
-                     E(acc.count.weight.a.flow)$weight>max(E(test)$weight)])
-
-test2.flow<- plot.igraph(test2,layout=layout.fruchterman.reingold, vertex.color="gray60", 
-     vertex.label= V(acc.count.weight.a.flow)$name,
-     edge.arrow.size = 0.1, edge.color = "gray80")
-
-
-#add back some vertices
-add.vertices <- user.flow.acc.count.weight.a$question.country[user.flow.acc.count.weight.a$inverse.weight.by.answer.country<
-  mean(user.flow.acc.count.weight.a$inverse.weight.by.answer.country)]
+                                           user.flow.sub.acc.count$weight.by.answer.country)
+names(user.flow.acc.count.weight.a) <- c("question.country","answer.country","weight.by.answer.country")
 
 
 
+#to make the graph looks better, we only keep the question countries those that belong to cme, lme and scand
+
+keep <- c("US", "AU", "NZ", "IE", "GB", "CA",
+         "DE", "AT", "JP", "BE", "FR", "IT", "NL", "CH", "JP",
+         "DK", "SE", "NO", "FI")
+
+k<- drop.levels(user.flow.acc.count.weight.a[user.flow.acc.count.weight.a$question.country
+                                             %in% keep,])
+k<- drop.levels(k[k$answer.country
+                                             %in% keep,])
+                
+high.share <- data.frame(k$question.country[k$weight.by.answer.country>
+                            quantile(k$weight.by.answer.country,0.75)],
+                         k$answer.country[k$weight.by.answer.country>
+                           quantile(k$weight.by.answer.country,0.75)],
+                         k$weight.by.answer.country[k$weight.by.answer.country>
+                           quantile(k$weight.by.answer.country,0.75)])
+
+names(high.share)<-c("question.country","answer.country","weight.by.answer.country")
+
+
+test2 <- graph.data.frame(high.share,directed=TRUE,vertices=NULL)
+
+E(test2)$weight <-high.share$weight.by.answer.country
+
+E(test2)[weight <= quantile(E(test2)$weight,0.50)]$color <- "gray80"
+E(test2)[weight > quantile(E(test2)$weight,0.50)]$color <- "green"
+E(test2)[weight >= quantile(E(test2)$weight,0.75)]$color <- "red"
+
+
+weight.a.ring<-plot.igraph(test2,layout=layout.fruchterman.reingold.grid, vertex.color="gray60", vertex.size=3,
+            vertex.label= V(test2)$name,
+            edge.arrow.size = 0.1, edge.color = E(test2)$color, main="Flow from questioner to answerer countries
+                           weighted by answer countries", 
+            sub="                   red: >=3rd quantile,
+ green: median to 3rd quantile,
+                           grey: <median")
+
+
+weight.a.tree<-plot.igraph(test2,layout=layout.reingold.tilford, vertex.color="gray60", vertex.size=3,
+                           vertex.label= V(test2)$name,
+                           edge.arrow.size = 0.1, edge.color = E(test2)$color, main="Flow from questioner to answerer countries
+                           weighted by answer countries", 
+                           sub="                   red: >=3rd quantile,
+ green: median to 3rd quantile,
+                           grey: <median")
+
+
+
+
+
+
+
+#graphing nodes and vector edges for weights by answering country
+
+
+user.flow.acc.count.weight.t <- data.frame(user.flow.sub.acc.count$question.country,
+                                           user.flow.sub.acc.count$answer.country,
+                                           user.flow.sub.acc.count$weight.by.total.answers)
+names(user.flow.acc.count.weight.t) <- c("question.country","answer.country","weight.by.total.answers")
+
+
+
+#to make the graph looks better, we only keep the question countries those that belong to cme, lme and scand
+
+keep <- c("US", "AU", "NZ", "IE", "GB", "CA",
+          "DE", "AT", "JP", "BE", "FR", "IT", "NL", "CH", "JP",
+          "DK", "SE", "NO", "FI")
+
+d<- drop.levels(user.flow.acc.count.weight.t[user.flow.acc.count.weight.t$question.country
+                                             %in% keep,])
+d<- drop.levels(d[d$answer.country
+                  %in% keep,])
+
+high.share.d <- data.frame(d$question.country[d$weight.by.total.answers>
+  quantile(d$weight.by.total.answers,0.75)],
+                         d$answer.country[d$weight.by.total.answers>
+                           quantile(d$weight.by.total.answers,0.75)],
+                         d$weight.by.total.answers[d$weight.by.total.answers>
+                           quantile(d$weight.by.total.answers,0.75)])
+
+names(high.share.d)<-c("question.country","answer.country","weight.by.total.answers")
+
+
+test3 <- graph.data.frame(high.share.d,directed=TRUE,vertices=NULL)
+
+E(test3)$weight <-high.share.d$weight.by.total.answers
+
+E(test3)[weight <= quantile(E(test3)$weight,0.50)]$color <- "gray80"
+E(test3)[weight > quantile(E(test3)$weight,0.50)]$color <- "green"
+E(test3)[weight >= quantile(E(test3)$weight,0.75)]$color <- "red"
+
+
+weight.t.ring<-plot.igraph(test3,layout=layout.fruchterman.reingold.grid, vertex.color="gray60", vertex.size=3,
+                           vertex.label= V(test3)$name,
+                           edge.arrow.size = 0.1, edge.color = E(test3)$color, main="Flow from questioner to answerer countries
+                           weighted by total answers", 
+                           sub="                   red: >=3rd quantile,
+ green: median to 3rd quantile,
+                           grey: <median")
+
+
+weight.t.tree<-plot.igraph(test3,layout=layout.reingold.tilford, vertex.color="gray60", vertex.size=3,
+                           vertex.label= V(test3)$name,
+                           edge.arrow.size = 0.1, edge.color = E(test3)$color, main="Flow from questioner to answerer countries
+                           weighted by total answers", 
+                           sub="                   red: >=3rd quantile,
+ green: median to 3rd quantile,
+                           grey: <median")
