@@ -288,3 +288,52 @@ weight.t.tree<-plot.igraph(test3,layout=layout.reingold.tilford, vertex.color="g
                            sub="                   red: >=3rd quantile,
  green: median to 3rd quantile,
                            grey: <median")
+
+
+
+
+#ZOOM in for CA, US, DE, GB
+
+only <- c("CA","US","DE","GB")
+oa<- drop.levels(user.flow.acc.count.weight.a[user.flow.acc.count.weight.a$question.country
+                                             %in% only,])
+oa<- drop.levels(oa[oa$answer.country
+                  %in% only,])
+
+# high.share.d <- data.frame(d$question.country[d$weight.by.total.answers>
+#   quantile(d$weight.by.total.answers,0.75)],
+#                            d$answer.country[d$weight.by.total.answers>
+#                              quantile(d$weight.by.total.answers,0.75)],
+#                            d$weight.by.total.answers[d$weight.by.total.answers>
+#                              quantile(d$weight.by.total.answers,0.75)])
+# 
+# names(high.share.d)<-c("question.country","answer.country","weight.by.total.answers")
+
+o<-data.frame(oa$question.country,oa$answer.country,oa$weight.by.answer.country)
+names(o)<-c("question.country","answer.country","weight.by.answer.country")
+
+test4 <- graph.data.frame(o,directed=TRUE,vertices=NULL)
+
+E(test4)$weight <-o$weight.by.answer.country
+
+E(test4)[weight <= quantile(E(test2)$weight,0.50)]$color <- "gray80"
+E(test4)[weight > quantile(E(test2)$weight,0.50)]$color <- "green"
+E(test4)[weight >= quantile(E(test2)$weight,0.75)]$color <- "red"
+
+
+weight.t.ring<-plot.igraph(test4,layout=layout.fruchterman.reingold.grid, vertex.color="gray60", vertex.size=3,
+                           vertex.label= V(test4)$name,
+                           edge.arrow.size = 0.1, edge.color = E(test4)$color, main="(ZOOM) Flow from questioner to answerer countries
+                           weighted by answer countries", 
+                           sub="                   red: >=3rd quantile,
+ green: median to 3rd quantile,
+                           grey: <median")
+
+
+weight.t.tree<-plot.igraph(test4,layout=layout.reingold.tilford, vertex.color="gray60", vertex.size=3,
+                           vertex.label= V(test4)$name,
+                           edge.arrow.size = 0.1, edge.color = E(test4)$color, main="(ZOOM) Flow from questioner to answerer countries
+                           weighted by answer countries", 
+                           sub="                   red: >=3rd quantile,
+ green: median to 3rd quantile,
+                           grey: <median")
