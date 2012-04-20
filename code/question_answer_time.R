@@ -1,3 +1,8 @@
+#Calculates the reponse time/wait time for questions to be answered
+#Only look at the accepted answers
+#Calculate both overall average time and average time by country
+#Pairwise t-test and ks-test on the response/wait time
+
 library(reshape)
 library(foreach)
 library(stringr)
