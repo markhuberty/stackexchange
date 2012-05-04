@@ -169,6 +169,69 @@ user.flow.sub.acc.count <- drop.levels(
   user.flow.sub.acc.count[user.flow.sub.acc.count$weight.by.total.answers
                           !=0,])
 
+#exploring whether tie zone could make any difference 
+
+#load in time zone
+time.zone <- read.csv("C:/users/miaomiaocui/stacKexchange/data/gmt.csv",header=FALSE)
+
+names(time.zone) <- c("country.code","GMT")
+
+
+user.flow.sub.acc.count<-merge(user.flow.sub.acc.count,time.zone,
+                               by.x="question.country",
+                               by.y="country.code",
+                               all=FALSE)
+
+names(user.flow.sub.acc.count)<-c("question.country","answer.country","flow.frequency","flow.quantiles",
+                                  "total.questions.asked.by.q.country","weight.by.answer.country",
+                                  "total.answers","weight.by.total.answers","q.GMT")
+
+user.flow.sub.acc.count<-merge(user.flow.sub.acc.count,time.zone,
+                               by.x="answer.country",
+                               by.y="country.code",
+                               all=FALSE)
+
+names(user.flow.sub.acc.count)<-c("answer.country","question.country","flow.frequency",
+                                  "flow.quantiles",
+                                  "total.questions.asked.by.q.country",
+                                  "weight.by.answer.country",
+                                  "total.answers","weight.by.total.answers",
+                                  "q.GMT","a.GMT")
+
+user.flow.sub.acc.count$time.zone.diff <- abs(user.flow.sub.acc.count$q.GMT-user.flow.sub.acc.count$a.GMT)
+
+#get country pairs
+a<-user.flow.sub.acc.count
+
+a$country.pair <- NULL
+
+for(i in 1:dim(a)[1])
+{a$country.pair[i]<-paste(as.character(a$question.country[i]),
+                                  as.character(a$answer.country[i]),sep=" ")}
+#if relative time diff>12, 24-12
+user.flow.sub.acc.count$time.zone.diff.r<-sapply(user.flow.sub.acc.count$time.zone.diff,
+                                                 function(x){if (x>12) x=24-x
+                                                             else x
+                                                             })
+a<-user.flow.sub.acc.count
+
+#plot the relatioship between time zone difference and bi-lateral rate
+time <- ggplot(a,aes(x=time.zone.diff.r,
+                     y=weight.by.answer.country))+
+                       geom_point()+
+                       geom_smooth()+
+                       opts(title="Correlation between time-zone difference and information flow",
+                            labs(x="time zone difference, hours",
+                                 y="share of questions raised by country on the left,
+                                 answered by country on the right"))
+print(time)
+                       
+
+
+
+
+
+
 #graphing nodes and vector edges for weights by answering country
 library(igraph)
 
@@ -322,7 +385,7 @@ E(test4)[weight >= quantile(E(test2)$weight,0.75)]$color <- "red"
 
 
 weight.t.ring<-plot.igraph(test4,layout=layout.fruchterman.reingold.grid, vertex.color="gray60", vertex.size=3,
-                           vertex.label= V(test4)$name,
+                           vertex.label= V(test4)$name,edge.curved=TRUE,
                            edge.arrow.size = 0.1, edge.color = E(test4)$color, main="(ZOOM) Flow from questioner to answerer countries
                            weighted by answer countries", 
                            sub="                   red: >=3rd quantile,
@@ -337,3 +400,4 @@ weight.t.tree<-plot.igraph(test4,layout=layout.reingold.tilford, vertex.color="g
                            sub="                   red: >=3rd quantile,
  green: median to 3rd quantile,
                            grey: <median")
+

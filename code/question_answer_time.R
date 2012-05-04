@@ -112,6 +112,8 @@ user.time<-user.time[user.time$wait.minutes>=0,]
 
 user.time<-user.time <- user.time[complete.cases(user.time),]
 
+write.csv(user.time,file="C:/Users/miaomiaocui/stackexchange/data/user_time.csv")
+
 #average wait time: 87.64 hours
 
 mean.wait.hours <- mean(user.time$wait.minutes)/60
@@ -153,7 +155,7 @@ avg.focus<-drop.levels(avg.focus[avg.focus$answer.country
                            %in% focus,])
 
 avg.focus$mean.wait.hours<-avg.focus$mean.wait.minutes/60
-write.csv(avg, file="C:/users/miaomiaocui/stackexchange/data/mean_wait_minutes_focus.csv",
+write.csv(avg.focus, file="C:/users/miaomiaocui/stackexchange/data/mean_wait_minutes_focus.csv",
           col.names=TRUE,row.names=FALSE)
 
 #time zone analysis----t and ks tests
@@ -269,3 +271,52 @@ plot.pairwise.wait.ks <- ggplot(ks.test.user.time.sub,
                                           axis.text.x=theme_text(angle=90, hjust=1,size=6),
                                       axis.text.y=theme_text(size=6))
 print(plot.pairwise.wait.ks)
+
+#plot histogram of user participating time
+
+
+for(i in 1:dim(user.time)[1])
+  {user.time$question.hour[i]<-str_split(user.time$question.date[i], " ")[[1]][2]
+   user.time$question.hour[i]<-str_split(user.time$question.hour[i], ":")[[1]][1]
+   }
+
+
+
+#draw histogram
+
+
+user.time$question.hour<- factor(user.time$question.hour,levels=c("0","1","2",
+                                                                  "3","4","5",
+                                                                  "6","7","8",
+                                                                  "9","10","11","12",
+                                                                  "13","14","15","16",
+                                                                  "17","18","19","20",
+                                                                  "21","22","23","24"
+                                                       ))
+
+user.time$question.hour.range <- cut(user.time$question.hour,breaks=8)
+
+plot.user.time.country <- ggplot(user.time,
+                           aes(x=question.hour)
+                           )+
+                             geom_histogram()+
+                             facet_wrap(~question.country,scales="free_y")+
+                             opts(title="Time for posting questions by country",
+                                  axis.text.x=theme_text(
+                                    hjust=1, size=6)
+                                  )+labs(x="question posting time")
+print(plot.user.time.country)
+
+for(i in 1:dim(user.time)[1])
+{user.time$answer.hour[i]<-str_split(user.time$answer.date[i], " ")[[1]][2]
+ user.time$answer.hour[i]<-str_split(user.time$answer.hour[i], ":")[[1]][1]
+}
+
+user.time$answer.hour<- factor(user.time$answer.hour,levels=c("0","1","2",
+                                                                  "3","4","5",
+                                                                  "6","7","8",
+                                                                  "9","10","11","12",
+                                                                  "13","14","15","16",
+                                                                  "17","18","19","20",
+                                                                  "21","22","23","24"
+                                                                  ))
