@@ -296,3 +296,127 @@ Blue line: complete pooling; Black line: mixed model",
 print(plot.skc)
 
 
+#EVERYTHING LOG now
+
+#skill counts coefficients
+scc <- data.high.rep
+
+scc$log.rep<-log(scc$reputation)
+scc$log.rep.std <- (scc$log.rep-mean(scc$log.rep))/(2*sd(scc$log.rep))
+
+#coefficents that do not include country-level variables, gaussian distribution
+reg.scc.g.1<-lmer(formula=log(skill.counts) ~ 
+  log.rep.std + epi + emplprot + medTenure + vocTrainSh + pcUnivEduc + 
+  (1|country.code), 
+                  data=scc)
+
+reg.scc.g.2<-lmer(formula=log(skill.counts) ~ 
+  log.rep.std + 
+  (1|country.code), 
+                data=scc)
+coef.scc.g.1 <- data.frame(coef(reg.scc.g.1)[[1]])
+
+coef.scc.g.1$country.code <- row.names(coef.scc.g.1)
+
+coef.scc.g.1 <- data.frame(coef.scc.g.1$country.code,coef.scc.g.1$X.Intercept.,
+                           coef.scc.g.1$log.rep.std)
+names(coef.scc.g.1)<-c("country.code","sc.intercept.g1","sc.rep.std.g1")
+
+coef.scc.g.2 <- data.frame(coef(reg.scc.g.2)[[1]])
+
+coef.scc.g.2$country.code <- row.names(coef.scc.g.2)
+
+coef.scc.g.2 <- data.frame(coef.scc.g.2$country.code,coef.scc.g.2$X.Intercept.,
+                           coef.scc.g.2$log.rep.std)
+names(coef.scc.g.2)<-c("country.code","sc.intercept.g2","sc.rep.std.g2")
+
+#mean skill level coefficients, gaussian dis~tribution
+skc <- data.high.rep
+
+#include country-level variables
+reg.skc<-glmer(formula=skill.mean.level ~ 
+  rep.std + epi + emplprot + medTenure + vocTrainSh + pcUnivEduc +
+  (1+rep.std|country.code), 
+               data=skc,
+               verbose=TRUE)
+
+#do not include country-level variables
+reg.skc<-glmer(formula=skill.mean.level ~ 
+  rep.std + (1+rep.std|country.code), 
+               data=skc,
+               verbose=TRUE)
+
+coef.skc <- data.frame(coef(reg.skc)[[1]])
+
+coef.skc$country.code <- row.names(coef.skc)
+
+coef.skc <- data.frame(coef.skc$country.code,coef.skc$X.Intercept.,coef.skc$rep.std)
+names(coef.skc)<-c("country.code","sk.intercept","sk.rep.std")
+
+#merge coefficients into data.high.rep
+
+data.high.rep.coef <- merge(data.high.rep.coef,coef.skc,by="country.code",all=FALSE)
+data.high.rep.coef <- merge(scc,coef.scc.g.1,by="country.code",all=FALSE)
+data.high.rep.coef <- merge(data.high.rep.coef,coef.scc.g.2,by="country.code",all=FALSE)
+
+
+#VI. Plot complete pooling and multilevel variable for countries
+plot.scc.g12 <- xyplot(log(skill.counts)~
+  log.rep.std|country.code, 
+                     data=data.high.rep.coef,
+                     main="Standardized reputation and skill counts
+Gaussian, varying intercepts, varying slopes, Poisson distribution
+                     Blue line: complete pooling; Black line: mixed model with country-level;
+                       Green line: mixed model without country-level variables",
+                xlab="standardized reputation",
+                     ylab="skill counts",
+                     panel=function(x,y,subscripts){
+                       panel.xyplot(x,y)
+                       panel.abline(glm(y~x),lty=1,col=4)
+                       panel.abline(data.high.rep.coef$sc.intercept.g1[subscripts]+
+                         data.high.rep.coef$sc.rep.std.g1[subscripts]*
+                         data.high.rep.coef$log.rep.std[subscripts],col="black")
+                       panel.abline(data.high.rep.coef$sc.intercept.g2[subscripts]+
+                         data.high.rep.coef$sc.rep.std.g2[subscripts]*
+                         data.high.rep.coef$log.rep.std[subscripts],col="green")
+                     })
+
+print(plot.scc.g12)
+
+
+plot.scc.g <- xyplot(skill.counts~
+  rep.std|country.code, 
+                     data=data.high.rep.coef,
+                     main="Standardized reputation and skill counts
+varying intercepts, varying slopes, Gaussian distribution
+                     Blue line: complete pooling; Black line: mixed mode",
+                xlab="standardized reputation",
+                     ylab="skill counts",
+                     panel=function(x,y,subscripts){
+                       panel.xyplot(x,y)
+                       panel.abline(glm(y~x),lty=1,col="blue")
+                       panel.abline(data.high.rep.coef$sc.intercept.g[subscripts]+
+                         data.high.rep.coef$sc.rep.std.g[subscripts]*
+                         data.high.rep.coef$rep.std[subscripts],col="black")
+                     })
+print(plot.scc.g)
+
+#skill level plotting
+
+plot.skc <- xyplot(skill.mean.level~
+  rep.std|country.code,
+                   data=data.high.rep.coef,
+                   main="Standardized reputation and mean skill levels
+varying intercepts, varying slopes
+                   Blue line: complete pooling; Black line: mixed model",
+                xlab="standardized reputation",
+                   ylab="mean skill levels",
+                   panel=function(x,y,subscripts){
+                     panel.xyplot(x,y)
+                     panel.abline(lm(y~x),lty=1,col=4)
+                     panel.abline(data.high.rep.coef$sk.intercept[subscripts]+
+                       data.high.rep.coef$sk.rep.std[subscripts]*
+                       data.high.rep.coef$rep.std[subscripts],col="black")
+                   })
+print(plot.skc)
+
