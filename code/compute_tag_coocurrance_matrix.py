@@ -7,6 +7,7 @@ import pickle
 import matplotlib as mpl
 mpl.use('Agg') ## Allows mpl to function w/o active X session
 import matplotlib.pyplot as plt
+import operator
 
 os.chdir('/home/markhuberty/Documents/stackexchange/code/')
 ## Load the sparse matrix of COUNT(posts) * COUNT(unique tags)
@@ -47,10 +48,11 @@ tag_matrix_multiply = tag_matrix_multiply.asfptype()
 
 ## Divide out the colsums to get the conditional probability of 
 ## co-incidence. First strip out the diagonal.
-to_keep = [idx for idx, r in enumerate(row_indices) if row_indices[idx] != col_indices[idx]]
-row_indices = [row_indices[idx] for idx in to_keep]
-col_indices = [col_indices[idx] for idx in to_keep]
+
 row_indices, col_indices = tag_matrix_multiply.nonzero()
+#to_keep = [idx for idx, r in enumerate(row_indices) if row_indices[idx] != col_indices[idx]]
+#row_indices = [row_indices[idx] for idx in to_keep]
+#col_indices = [col_indices[idx] for idx in to_keep]
 tag_frequencies = [tag_frequency[i] for i in col_indices]
 
 
@@ -107,7 +109,21 @@ def write_mcl_format(g, filename):
 
 write_mcl_format(g_tag, '../data/g_tag_mcl.txt')
 
+## Calculate betweenneess for node importance to the
+## structure; then sort
 tag_betweenness = nx.betweenness_centrality(g_tag)
+btwn_sorted = sorted(tag_betweenness.iteritems(),
+                     key=operator.itemgetter(1),
+                     reverse=True
+                     )
+## Write out the betweeness data to a csv file
+conn = open('../data/tag_betweenness.csv', 'wt')
+writer = csv.writer(conn)
+writer.writerow(['node', 'btwnness'])
+for k in btwn_sorted.keys():
+    writer.writerow([k, btwn_sorted[k]])
+conn.close()
+    
 
 ## And generate the MST w/ Kruskal's alg
 mst = nx.minimum_spanning_tree(g_tag)
