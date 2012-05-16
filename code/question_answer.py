@@ -31,7 +31,7 @@ conn_cursor.close()
 conn.close()
 ## End data read-in
 
-conn = open('/mnt/fire_80/question_answer_counts.csv', 'wt')
+conn = open('/mnt/fwire_80/question_answer_counts.csv', 'wt')
 writer = csv.writer(conn)
 writer.writerow(['week','user','post_type','count'])
 for r in flow_data:

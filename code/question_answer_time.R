@@ -100,8 +100,20 @@ user.time<-drop.levels(user.time[user.time$vote.type==1,])
 
 #format date and time
 
+user.time$question.date <-
+  as.POSIXct(as.character(user.time$question.date),
+             format="%m/%d/%Y %H:%M")
+user.time$answer.date <-
+  as.POSIXct(as.character(user.time$answer.date),
+             format="%m/%d/%Y %H:%M")
 
-user.time$wait.minutes<-as.integer(difftime(as.POSIXct(as.character(user.time$answer.date),
+user.time$wait.minutes <-
+  as.integer(difftime(user.time$answer.date,
+                      user.time$question.date,
+                      units="mins"
+                      )
+             )
+                                   uas.integer(difftime(as.POSIXct(as.character(user.time$answer.date),
                                          format="%m/%d/%Y %H:%M"),
                               as.POSIXct(as.character(user.time$question.date),
                                          format="%m/%d/%Y %H:%M"),units="mins"))
@@ -271,6 +283,8 @@ plot.pairwise.wait.ks <- ggplot(ks.test.user.time.sub,
                                           axis.text.x=theme_text(angle=90, hjust=1,size=6),
                                       axis.text.y=theme_text(size=6))
 print(plot.pairwise.wait.ks)
+<<<<<<< HEAD
+=======
 
 #plot histogram of user participating time
 
@@ -320,3 +334,4 @@ user.time$answer.hour<- factor(user.time$answer.hour,levels=c("0","1","2",
                                                                   "17","18","19","20",
                                                                   "21","22","23","24"
                                                                   ))
+>>>>>>> origin/master
