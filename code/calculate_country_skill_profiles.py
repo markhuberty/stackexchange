@@ -3,6 +3,8 @@ import pandas as pds
 import os
 import numpy as np
 import platform
+import scipy
+import scipy.sparse as sp
 
 def calculate_rxa(input_df):
     """
@@ -29,12 +31,23 @@ def calculate_rxa(input_df):
     rxa = country_product_share.transpose() / world_product_share
     return rxa
 
-
-os.chdir('/Users/markhuberty/Documents/Research/Papers/stackexchange/')
+os.chdir('/home/markhuberty/Documents/stackexchange')
+#os.chdir('/Users/markhuberty/Documents/Research/Papers/stackexchange/')
 
 
 users_skills = pds.read_csv('./data/user_skill_map.csv')
-users_geo = pds.read_csv('./data/users_geocoded_final.csv')
+users_geo = pds.read_csv('./data/users_geocoded_final.csv', index_col=1)
+users_skills_wide = users_skills.pivot('userid', 'skillid', 'skill_value').to_sparse()
+
+users_rxa = calculate_rxa(users_skills_wide)
+user_specialization_count = (users_rxa > 1).sum(axis=1)
+user_specialization_count.name = 'usr_spec_ct'
+test = users_geo.join(user_specialization_count, how='inner')
+
+test_group = test.groupby('country.code')
+ctry_spec = test_group.agg({'usr_spec_ct':np.median})
+
+test.to_csv('./data/ctry_spec_test.csv')
 
 skills_geo = pds.merge(users_skills,
                        users_geo,
@@ -65,4 +78,74 @@ skill_rxa = calculate_rxa(country_skill_levels_wide)
 country_skill_diversification = (skill_rxa > 1).sum(axis=1)
 country_skill_diversification.sort()
 
+# user_skill; right now, super-slow. Would be faster
+# w/ sparse matrix...
+users_skills_group = users_skills.groupby(['userid','skillid'])
+users_skills_wide = users_skills_group.unstack()
 
+
+
+
+skillids = list(set(users_skills['skillid']))
+userids = list(set(users_skills['userid']))
+
+idx_x = []
+idx_y = []
+val = []
+
+test = {}
+userids_long = users_skills['userid']
+for i, r in enumerate(userids_long):
+    if test.has_key(r):
+        idx_x.append(test[r])
+    else:
+        test[r] = userids.index(r)
+        idx_x.append(test[r])
+
+users_skills_csc = sp.csc_matrix((array(users_skills['skill_value']),
+                                  (idx_x, list(users_skills['skillid']))),
+                                 shape=(len(userids), len(skillids))
+                                 )
+users_skills_mat = users_skills_csc.todense()
+
+total_skill_score = users_skills_mat.sum()
+skill_scores = users_skills_mat.sum(axis=0).tolist()
+skill_scores = np.array(skill_scores)
+global_skill_share = skill_scores / total_skill_score
+
+user_skill_share = users_skills_mat.copy()
+
+for i in range(user_skill_share.shape[0]):
+    vec = user_skill_share[i, ]
+    vec = np.array([vec[0,j] for j in range(vec.shape[0])])
+    vec_total = sum(vec)
+    if vec_total < 1 and vec_total > -1:
+        vec_total = round(vec_total)
+    vec = vec / vec_total
+    test = [v for v in vec if v > 1 or v < -1]
+    if len(test) > 0:
+        print i
+    user_skill_share[i, ] = vec
+
+rsa = user_skill_share.copy()
+for j, v in enumerate(global_skill_share):
+    rsa[:,j] = user_skill_share[:,j] / v
+
+blah = [sum(rsa[i,] > 1) for i in range(rsa.shape[0])]
+    
+for i,d in enumerate(user_skill_share.data):
+    if np.isnan(d) or np.isinf(d):
+        user_skill_share.data[i] = 0
+
+rsa = users_skills_csc.copy().tocsr()
+for i,v in enumerate(global_skill_share):
+    idx_start = users_skills_csc.indptr[i]
+    idx_end = users_skills_csc.indptr[i+1]
+    #idxs = users_skills_csc.indices[idx_start:idx_end]
+    rsa.data[idx_start:idx_end] = user_skill_share[idx_start:idx_end] / v
+
+rsa.data[np.isnan(rsa.data)] = 0
+
+## Here's not right. Needs the right form of division to generate the
+## proper csc matrix form. See compute_intl_hs6_pathlengths for form of the
+## code.
