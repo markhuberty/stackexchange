@@ -1,6 +1,4 @@
 library(reshape)
-library(foreach)
-library(stringr)
 library(ggplot2)
 library(Hmisc)
 library(gdata)
