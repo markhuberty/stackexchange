@@ -116,6 +116,14 @@ data.high.rep$log.rep.std <-
   (log(data.high.rep$reputation)-mean(log(data.high.rep$reputation)))/
   (2*sd(log(data.high.rep$reputation)))
 
+#add user skill standard deviations
+user.skill.sd.mean <- read.csv("C:/Users/miaomiaocui/stackexchange/data/user_skill_value_summary.csv",
+         header=TRUE)
+
+data.high.rep <- merge(data.high.rep,
+                       user.skill.sd.mean,
+                       by="userid",
+                       all=FALSE)
 #add regions
 lme <- c("US", "AU", "NZ", "IE", "GB", "CA")
 cme <- c("DE", "AT", "JP", "BE", "FR", "IT", "CH","NL")
@@ -128,7 +136,7 @@ data.high.rep$region[data.high.rep$country.code
 data.high.rep$region[data.high.rep$country.code
                      %in% cme]<-"CME:DE,AU,JP,BE,FR,IT,NL,CH"
 
-   
+ 
 sc.reg <- glm(log(skill.counts) ~ log.rep.std + factor(country.code), 
               data=data.high.rep,
               family=gaussian)   
@@ -136,40 +144,126 @@ sk.reg <- glm(log(skill.mean.level + 5.0001) ~ log.rep.std + factor(country.code
               data=data.high.rep,
               family=gaussian)
 
+data.high.rep<-na.omit(data.high.rep)
 
-sc.epi.reg <- glm(log(skill.counts) ~ log.rep.std + epi + factor(country.code) -1, 
-              data=data.high.rep,
-              family=gaussian)
-sk.epi.reg <- glm(skill.mean.level ~ log.rep.std + epi + factor(country.code) -1, 
-                  data=data.high.rep,
-                  family=gaussian)
-#impact of speaking english
+#test for heteroscedasticity useing the Breusch-Pagan test (hetero exists)
+htest<- bptest(sd.skill.value  ~ log.rep.std + duration +
+  factor(country.code) -1, data=data.high.rep)
 
-data.high.rep$english[data.high.rep$country.code
-                     %in% lme]<-1
-data.high.rep$english[data.high.rep$country.code
-                     %in% scand]<-0
-data.high.rep$english[data.high.rep$country.code
-                     %in% cme]<-0
+#generalized linear regression
+data.high.rep.high.sd <- drop.levels(data.high.rep[data.high.rep$sd.skill.value>0,])
 
-sc.english.reg.only <- glm(log(skill.counts) ~  log.rep.std+
-  english  -1, 
-                      data=data.high.rep,
-                      family=gaussian)
+sk.sd.reg <- glm(sd.skill.value ~ log.rep.std + duration +
+  factor(country.code) -1,
+                 data=data.high.rep.high.sd,
+                 family=gaussian)
 
-sk.english.reg.only <- glm(skill.mean.level ~ log.rep.std +
-  english -1, data= data.high.rep,family=gaussian)
+#test fit of sk.sd.reg
+test.sk.sd.reg <- predict(sk.sd.reg)
+plot(data.high.rep.high.sd$sd.skill.value ~ test.sk.sd.reg, 
+     ylim=c(min(data.high.rep.high.sd$sd.skill.value),
+            quantile(data.high.rep.high.sd$sd.skill.value,0.75))
+     )
+#plot country indicator coefficents
+coef.sk.sd.reg <- data.frame(coef(summary(sk.sd.reg)))
+#take out log.rep.std and duration
+coef.sk.sd.reg$coef.name <- row.names(coef.sk.sd.reg)
+
+coef.sk.sd.reg <- drop.levels(coef.sk.sd.reg
+                              [coef.sk.sd.reg$coef.name!="log.rep.std",])
+coef.sk.sd.reg <- drop.levels(coef.sk.sd.reg
+                              [coef.sk.sd.reg$coef.name!="duration",])
+coef.sk.sd.reg$country.code <- c("AT","AU","BE","CA","CH","DE","DK",
+                                 "FI","FR","GB","IE","IT","JP","NL","NO",
+                                 "SE","US")
+
+levels(coef.sk.sd.reg$country.code)<-c("FI","BE","AU","IT","CA","AT","NL",
+                                       "IE","NO","US","SE","CH","GB","FR",
+                                       "DE","DK","JP")
+#add error bar
+limits <- aes(ymax=Estimate + Std..Error,ymin=Estimate - Std..Error,
+              data=coef.sk.sd.reg)
+
+ggplot(coef.sk.sd.reg,aes(x=country.code,y=Estimate))+
+  geom_point()+
+  geom_errorbar(limits,width=0.25)+
+  opts(title="Country indicator coefficients for sd.skill.value (no log)
++/- 1 standard error bar",
+       xlab="countries",
+       ylab="county indicator coefficient estimate")+
+  scale_x_discrete(limits=levels(coef.sk.sd.reg$country.code))
 
 
-sc.english.reg <- glm(log(skill.counts) ~  log.rep.std+
-  english + factor(country.code) -1, 
-                  data=data.high.rep,
-                  family=gaussian)
+#plot heteroscedasticity
+plot(sk.sd.reg$resid ~ data.high.rep.high.sd$log.rep.std,
+     ylim=c(min(sk.sd.reg$resid),
+            quantile(sk.sd.reg$resid,0.75)))
+plot(sk.sd.reg$resid ~ data.high.rep.high.sd$duration,
+     ylim=c(min(sk.sd.reg$resid),
+            quantile(sk.sd.reg$resid,0.75)))
 
-sk.english.reg <- glm(skill.mean.level ~  log.rep.std+
-  english + factor(country.code) -1, 
-                      data=data.high.rep,
-                      family=gaussian)
+#robust linear model
+library(MASS)
+sk.sd.r.reg <- rlm(sd.skill.value ~ log.rep.std + duration +
+  factor(country.code) -1,
+                   data=data.high.rep)
 
-plot(log(data.high.rep$skill.counts), data.high.rep$log.rep.std)
-abline(sc.reg)
+
+
+a<-length(data.high.rep$sd.skill.value)-length(coef(sk.sd.reg))-1
+b<-length(data.high.rep$sd.skill.value) - 1
+
+r.adjusted.squared.sk.sd <- 1 - (b/a)*(sum((data.high.rep$sd.skill.value-test.sk.sd.reg)^2)/
+  sum((data.high.rep$sd.skill.value-mean(data.high.rep$sd.skill.value))^2))
+
+
+
+log.sk.sd.reg <- glm(log(sd.skill.value) ~ log.rep.std + duration +
+  factor(country.code) -1, 
+                     data=data.high.rep.high.sd,
+                     family=gaussian)
+#plot country indicator coefficents
+coef.log.sk.sd.reg <- data.frame(coef(summary(log.sk.sd.reg)))
+#take out log.rep.std and duration
+coef.log.sk.sd.reg$coef.name <- row.names(coef.log.sk.sd.reg)
+
+coef.log.sk.sd.reg <- drop.levels(coef.log.sk.sd.reg
+                              [coef.log.sk.sd.reg$coef.name!="log.rep.std",])
+coef.log.sk.sd.reg <- drop.levels(coef.log.sk.sd.reg
+                              [coef.log.sk.sd.reg$coef.name!="duration",])
+coef.log.sk.sd.reg$country.code <- c("AT","AU","BE","CA","CH","DE","DK",
+                                 "FI","FR","GB","IE","IT","JP","NL","NO",
+                                 "SE","US")
+
+levels(coef.log.sk.sd.reg$country.code)<-c("IE","FI","GB","CA","IT","US","AU",
+                                       "DK","BE","AT","SE","NL","DE","JP",
+                                           "NO","FR","CH")
+#add error bar
+limits <- aes(ymax=Estimate + Std..Error,ymin=Estimate - Std..Error,
+              data=coef.log.sk.sd.reg)
+
+ggplot(coef.log.sk.sd.reg,aes(x=country.code,y=Estimate))+
+  geom_point()+geom_errorbar(limits,width=0.25)+
+  opts(title="country indicator coefficients for log(sd.skill.value)
+       +/- 1 standard error bar")+
+  scale_x_discrete(limits=levels(coef.log.sk.sd.reg$country.code))
+
+sk.sd.r.reg <- rlm(log(sd.skill.value + 1e-05) ~ log.rep.std + duration +
+  factor(country.code) -1,
+                   data=data.high.rep)
+ftest<-anova.glm(log.sk.sd.reg,test="F")
+
+#test fit of sk.sd.reg
+test.log.sk.sd.reg <- predict(log.sk.sd.reg)
+plot(log(data.high.rep.high.sd$sd.skill.value) ~ test.log.sk.sd.reg, 
+     ylim=c(min(log(data.high.rep.high.sd$sd.skill.value)),
+            quantile(log(data.high.rep.high.sd$sd.skill.value),0.75)))
+
+a<-length(data.high.rep$sd.skill.value)-length(coef(log.sk.sd.reg))-1
+b<-length(data.high.rep$sd.skill.value) - 1
+
+
+r.adjusted.squared.log.sk.sd <- 1 - 
+  (b/a)*(sum((log(data.high.rep$sd.skill.value+1e-05)-test.log.sk.sd.reg)^2)/
+  sum((log(data.high.rep$sd.skill.value+1e-05)-  
+  mean(log(data.high.rep$sd.skill.value+1e-05)))^2))

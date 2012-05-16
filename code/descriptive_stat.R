@@ -15,7 +15,8 @@ user$Id <- NULL
 user$DisplayName <- NULL
 
 #assign binary values to website and dataframe it
-user$web.binary <- ifelse(is.na(user$WebsiteUrl),0,1)
+user$web.binary <- ifelse(is.na(user$WebsiteUrl)|user$WebsiteUrl=="http://-"|
+  user$WebsiteUrl=="http://N/A"|user$WebsiteUrl=="http:////",0,1)
 user.mean.web <- data.frame(tapply(user$web.binary,user$country.code,mean))
 
 #deal with dates
