@@ -17,8 +17,8 @@ import numpy as np
 import pandas as pds
 
 #os.chdir('C:/Users/miaomiaocui/stackexchange/')
-#os.chdir('/home/markhuberty/Documents/stackexchange')
-os.chdir('/Users/markhuberty/Documents/Research/Papers/stackexchange')
+os.chdir('/home/markhuberty/Documents/stackexchange')
+#os.chdir('/Users/markhuberty/Documents/Research/Papers/stackexchange')
 
 question_answer_vote = pds.read_csv('./data/vote_counts_by_qid_aid_uid.csv')
 

@@ -27,7 +27,8 @@ format.date2 <- function(x, f, t){
 
 }
 
-setwd("~/Documents/Research/Papers/stackexchange/")
+#setwd("~/Documents/Research/Papers/stackexchange/")
+setwd("~/Documents/stackexchange")
 country.user.skill <- read.csv("./data/users_skills_geo.csv",
                                header=TRUE
                                )
@@ -60,7 +61,7 @@ country.user.skill$voc[country.user.skill$country.code %in% scand] <- "Scand."
 plot.skill.value <-
                            ggplot(country.user.skill[country.user.skill$skill_value > 0,],
                            aes(x=voc,
-                               y=skill_value,
+                               y=log10(skill_value + 1),
                                colour=voc
                                )
                            ) +
@@ -73,16 +74,21 @@ user.skill.count <- tapply(country.user.skill$userid,
                            country.user.skill$userid,
                            length
                            )
-user.skill.mean <- tapply(country.user.skill$userid,
+user.skill.mean <- tapply(country.user.skill$skill_value,
                            country.user.skill$userid,
                            mean
                            )
+user.skill.median <- tapply(country.user.skill$skill_value,
+                            country.user.skill$userid,
+                            median
+                            )
 
 df <- data.frame(names(user.skill.count),
                  user.skill.count,
-                 user.skill.mean
+                 user.skill.mean,
+                 user.skill.median
                  )
-names(df) <- c("userid", "skillcount", "skillmean")
+names(df) <- c("userid", "skillcount", "skillmean", "skillmedian")
 df$userid <- as.integer(df$userid)
 df <- df[order(df$userid),]
 
@@ -105,7 +111,7 @@ plot.country.skillcount <- ggplot(df,
                      
 print(plot.country.skillcount)
 
-plot.country.skillcount <- ggplot(df,
+plot.country.skillmean <- ggplot(df,
                                   aes(x=skillmean,
                                       group=voc,
                                       colour=voc
@@ -114,8 +120,19 @@ plot.country.skillcount <- ggplot(df,
   geom_density() +
   facet_wrap( ~ duration.quantile)## +
   ## scale_x_continuous(limits=c(0,20))
-                     
-print(plot.country.skillcount)
+
+plot.country.skillmed <- ggplot(df,
+                                  aes(x=lskillmedian,
+                                      group=voc,
+                                      colour=voc
+                                      )
+                                  ) +
+  geom_density() +
+  facet_wrap( ~ duration.quantile)## +
+  ## scale_x_continuous(limits=c(0,20))
+
+
+print(plot.country.skillmed)
 
 
 plot.country.skillcount <- ggplot(df,
