@@ -95,8 +95,20 @@ user.time<-drop.levels(user.time[user.time$vote.type==1,])
 
 #format date and time
 
+user.time$question.date <-
+  as.POSIXct(as.character(user.time$question.date),
+             format="%m/%d/%Y %H:%M")
+user.time$answer.date <-
+  as.POSIXct(as.character(user.time$answer.date),
+             format="%m/%d/%Y %H:%M")
 
-user.time$wait.minutes<-as.integer(difftime(as.POSIXct(as.character(user.time$answer.date),
+user.time$wait.minutes <-
+  as.integer(difftime(user.time$answer.date,
+                      user.time$question.date,
+                      units="mins"
+                      )
+             )
+                                   uas.integer(difftime(as.POSIXct(as.character(user.time$answer.date),
                                          format="%m/%d/%Y %H:%M"),
                               as.POSIXct(as.character(user.time$question.date),
                                          format="%m/%d/%Y %H:%M"),units="mins"))

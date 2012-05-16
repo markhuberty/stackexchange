@@ -16,7 +16,8 @@ import pickle
 #os.chdir("../data/")
 
 ## Read in the tag vector from the database
-conn = MySQLdb.connect(host="localhost",
+conn = MySQLdb.connect(host="127.0.0.1",
+                       port=3306,
                        user="markhuberty",
                        passwd="overflowpwd",
                        db="stackoverflow"
