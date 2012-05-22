@@ -93,7 +93,7 @@ random.sample <- function(qa,total){
 
 qa.count.sample<-random.sample(qa.count.sub,1000)
 write.csv(qa.count.sample,
-          file="/mnt/fwire_80/stackexchange/qa_count_sample2.csv",
+          file="/mnt/fwire_80/stackexchange/qa_count_sample.csv",
           row.names=FALSE)
 
 
