@@ -54,41 +54,17 @@ qa.count$time<-qa.count$X1year*1e5+qa.count$X2week
 qa.count<-qa.count[order(qa.count$user,qa.count$time),]
 
 #cumulative count
-qa.count$cum.question.count<-data.frame(unlist(tapply(
-  qa.count$question.count,factor(qa.count$user),cumsum)))
+qa.count$cum.question.count<-unlist(tapply(
+  qa.count$question.count,factor(qa.count$user),cumsum))
 
-qa.count$cum.answer.count<-data.frame(unlist(tapply(
-  qa.count$answer.count,factor(qa.count$user),cumsum)))
+qa.count$cum.answer.count<-unlist(tapply(
+  qa.count$answer.count,factor(qa.count$user),cumsum))
 
 qa.count$cum.question.proportion<-qa.count$cum.question.count/
   (qa.count$cum.question.count+qa.count$cum.answer.count)
 
 
-#plot mean question proportion by country
-qa.count.sub.mean <- data.frame(tapply(qa.count.sub$question.proportion,
-                                       qa.count.sub$country.code,mean))
-qa.count.sub.mean$country.code <- row.names(qa.count.sub.mean)
-names(qa.count.sub.mean) <- c("mean.question.proportion","country.code")
-pdf(file="/mnt/fwire_80/stackexchange/plot1.pdf")                             
-plot1<-ggplot(qa.count.sub.mean,
-              aes(x=country.code,
-                  y=mean.question.proportion))+
-                    geom_point()+
-                    opts(title="Average proportion of questions by country",
-                         axis.text.x=theme_text(size=4))+
-                           labs(x="countries",
-                                y="average question proportion")
-print(plot1)
-dev.off()
 
-nohup R CMD BATCH file name &
-  
-  more fil.Rout
 
-random sample 
-
-unique.users=unique(users)
-user.to.keep=sample(unique.users,100,replace=FALSE)
-data.to.keep = users[users %in% user.to.kepp]
 
 
