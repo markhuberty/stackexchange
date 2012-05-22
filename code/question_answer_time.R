@@ -82,7 +82,8 @@ country.sub <- c("AU",
                  "CY",
                  "CZ",
                  "RU",
-                 "MX"
+                 "MX",
+                 "JP"
                  )
 
 #drop question countries that we are not interested in
