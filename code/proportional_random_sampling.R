@@ -1,7 +1,7 @@
 
 random.sample <- function(qa,total){
   #get sample size, with proportion of counts by country, share of total
-  sample.proportion<-summary(qa$country.code)/sum(sample.proportion)
+  sample.proportion<-summary(qa$country.code)/sum(summary(qa$country.code))
   #get sample size
   sample.size <- round(sample.proportion * total)
   
