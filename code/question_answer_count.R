@@ -10,6 +10,7 @@ q.a.count <- read.csv("/mnt/fwire_80/stackexchange/
 names(q.a.count) <- c("week","user","post.type","count")
 q<-drop.levels(q.a.count[q.a.count$post.type==1,])
 a<-drop.levels(q.a.count[q.a.count$post.type==2,])
+qa.count<-NULL
 qa.count<-merge(q,a,by=c("user","week"),all=TRUE)
 names(qa.count)<-c("user","week","post.type.1",
                    "question.count","post.type.2","answer.count")
