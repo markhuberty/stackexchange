@@ -63,8 +63,36 @@ qa.count$cum.answer.count<-unlist(tapply(
 qa.count$cum.question.proportion<-qa.count$cum.question.count/
   (qa.count$cum.question.count+qa.count$cum.answer.count)
 
+#take out countries that we do not care about
+country.sub <- c("AU","US","GB","DE","NO","SE","SK","NL","LV","LI","ES","EE",
+                 "PL","IT","PT","FI","DK","FR","CA","IE","NZ","IL","LU","BE",
+                 "SI","CH","BG","RO","HU","GR","AT","MT","CY","CZ","RU","MX",
+                 "JP")
+qa.count.sub<-drop.levels(qa.count[qa.count$country.code %in% country.sub,])
 
+#random sampling
+random.sample <- function(qa,total){
+  #get sample size, with proportion of counts by country, share of total
+  sample.proportion<-summary(qa$country.code)/sum(sample.proportion)
+  #get sample size
+  sample.size <- round(sample.proportion * total)
+  
+  country.names<-names(sample.size)
+  
+  out <- NULL
+  for(i in 1:length(country.names))
+  {
+    data=qa[qa$country.code==country.names[i],]
+    unique.users=unique(data$user)
+    user.to.keep=sample(unique.users, sample.size[[i]],replace=FALSE)
+    data.to.keep=data[data$user %in% user.to.keep,]
+  }
+  out <- rbind(out,data.to.keep)
+}
 
-
+qa_count_sample<-random.sample(qa.count.sub,1000)
+write.csv(qa_count_sample,
+          file="/mnt/fwire_80/stackexchange/qa_count_sample.csv",
+          row.names=FALSE)
 
 
