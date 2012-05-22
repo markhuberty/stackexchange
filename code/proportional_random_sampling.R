@@ -16,6 +16,6 @@ random.sample <- function(qa,total){
     data.to.keep=data[data$user %in% user.to.keep,]
     out <- rbind(out,data.to.keep)
     }
-    
+   return(out) 
 }
 

@@ -87,8 +87,8 @@ random.sample <- function(qa,total){
     unique.users=unique(data$user)
     user.to.keep=sample(unique.users, sample.size[[i]],replace=FALSE)
     data.to.keep=data[data$user %in% user.to.keep,]
-  }
-  out <- rbind(out,data.to.keep)
+    out <- rbind(out,data.to.keep)}
+  return(out)
 }
 
 qa.count.sample<-random.sample(qa.count.sub,1000)
