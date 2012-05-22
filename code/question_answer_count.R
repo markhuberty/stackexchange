@@ -91,9 +91,9 @@ random.sample <- function(qa,total){
   out <- rbind(out,data.to.keep)
 }
 
-qa_count_sample<-random.sample(qa.count.sub,1000)
-write.csv(qa_count_sample,
-          file="/mnt/fwire_80/stackexchange/qa_count_sample.csv",
+qa.count.sample<-random.sample(qa.count.sub,1000)
+write.csv(qa.count.sample,
+          file="/mnt/fwire_80/stackexchange/qa_count_sample2.csv",
           row.names=FALSE)
 
 
