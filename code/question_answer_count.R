@@ -70,30 +70,104 @@ country.sub <- c("AU","US","GB","DE","NO","SE","SK","NL","LV","LI","ES","EE",
                  "SI","CH","BG","RO","HU","GR","AT","MT","CY","CZ","RU","MX",
                  "JP")
 qa.count.sub<-drop.levels(qa.count[qa.count$country.code %in% country.sub,])
+# 
+# #random sampling
+# random.sample <- function(qa,total){
+#   #get sample size, with proportion of counts by country, share of total
+#   sample.proportion<-summary(qa$country.code)/sum(sample.proportion)
+#   #get sample size
+#   sample.size <- round(sample.proportion * total)
+#   
+#   country.names<-names(sample.size)
+#   
+#   out <- NULL
+#   for(i in 1:length(country.names))
+#   {
+#     data=qa[qa$country.code==country.names[i],]
+#     unique.users=unique(data$user)
+#     user.to.keep=sample(unique.users, sample.size[[i]],replace=FALSE)
+#     data.to.keep=data[data$user %in% user.to.keep,]
+#     out <- rbind(out,data.to.keep)}
+#   return(out)
+# }
+# 
+# qa.count.sample<-random.sample(qa.count.sub,1000)
+# write.csv(qa.count.sample,
+#           file="/mnt/fwire_80/stackexchange/qa_count_sample.csv",
+#           row.names=FALSE)
 
-#random sampling
-random.sample <- function(qa,total){
-  #get sample size, with proportion of counts by country, share of total
-  sample.proportion<-summary(qa$country.code)/sum(sample.proportion)
-  #get sample size
-  sample.size <- round(sample.proportion * total)
+
+#using bootstrap to calculate mean,med and 95% CI
+
+calc.boot <- function(value, 
+                      time, 
+                      n.boot=10, 
+                      probs=c(0.025, 0.975),
+                      fun="mean"){
   
-  country.names<-names(sample.size)
+  val.time <- split(value,time)
   
-  out <- NULL
-  for(i in 1:length(country.names))
-  {
-    data=qa[qa$country.code==country.names[i],]
-    unique.users=unique(data$user)
-    user.to.keep=sample(unique.users, sample.size[[i]],replace=FALSE)
-    data.to.keep=data[data$user %in% user.to.keep,]
-    out <- rbind(out,data.to.keep)}
+  out <- lapply(val.time, function(x){
+    
+    boot.val(x, n.boot, probs, fun)
+    
+  })
+  
+  mean.out = sapply(out, function(x) mean(x, na.rm=TRUE))
+  quantile.out = sapply(out, function(x) quantile(x, probs=probs,na.rm=TRUE))
+  out = data.frame(names(mean.out), round(mean.out, 4), t(round(quantile.out, 4)))
+  names(out) <- c("time", "sum.stat", "ci.lower", "ci.upper")
+  return(out)
+  
+  
+}
+
+boot.val <- function(val, n.boot, probs, fun="mean"){
+  
+  out <- sapply(1:n.boot, function(x){
+    
+    sample.vec <- sample(1:length(val), length(val), replace=TRUE)
+    val.boot = val[sample.vec]
+    
+    this.fun <- match.fun(fun)
+    this.fun(val.boot, na.rm=TRUE)
+    
+  })  
+  
+  return(out)
+  
+}
+
+
+#calculate sample means
+
+time.country <- function(value,data){
+  out<-NULL
+  country <- levels(data$country.code)
+  for (i in 1:length(country)){
+    country.data<-cbind(country[i],
+                        calc.boot(value[data$country.code==country[i]], 
+                                  sample$week[data$country.code==country[i]], 
+                                  n.boot=10, probs=c(0.025, 0.975),
+                                  fun="mean"))
+    out<-rbind(out,country.data)}
   return(out)
 }
 
-qa.count.sample<-random.sample(qa.count.sub,1000)
-write.csv(qa.count.sample,
-          file="/mnt/fwire_80/stackexchange/qa_count_sample.csv",
-          row.names=FALSE)
+mean.cum.q.p <- time.country(qa.count.sub$cum.question.proportion,qa.count.sub)
+names(mean.cum.q.p)<-c("country.code","week","mean","ci.lower","ci.upper")
 
-
+pdf("/mnt/fwire_80/stackexchange/mean_cum_question_proportion.pdf")
+plot1 <- ggplot(mean.cum.q.p,
+                aes(x=week,
+                    y=mean,
+                    ymin=ci.lower,
+                    ymax=ci.upper
+                    )
+                ) +
+                  geom_pointrange() + 
+                  facet_wrap(~country.code)+
+                  opts(title="Mean cumulative proportion of questions by country, 95% CI",
+                       axis.text.x=theme_text(hjust=1,angle=90,size=6))
+print(plot1)
+dev.off()
