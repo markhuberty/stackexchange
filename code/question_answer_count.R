@@ -151,7 +151,7 @@ time.country <- function(value,data){
 mean.cum.q.p <- time.country(qa.count.sub$cum.question.proportion,qa.count.sub)
 names(mean.cum.q.p)<-c("country.code","week","mean","ci.lower","ci.upper")
 
-pdf("/mnt/fwire_80/stackexchange/mean_cum_question_proportion.pdf")
+pdf("/mnt/fwire_80/stackexchange/mean_cum_question_proportion_new.pdf")
 plot1 <- ggplot(mean.cum.q.p,
                 aes(x=week,
                     y=mean,
