@@ -104,23 +104,17 @@ calc.boot <- function(value,
                       n.boot=10, 
                       probs=c(0.025, 0.975),
                       fun="mean"){
-  
   val.time <- split(value,time)
-  
   out <- lapply(val.time, function(x){
-    
-    boot.val(x, n.boot, probs, fun)
-    
-  })
-  
+          boot.val(x, n.boot, probs, fun)
+          }
+                )
   mean.out = sapply(out, function(x) mean(x, na.rm=TRUE))
   quantile.out = sapply(out, function(x) quantile(x, probs=probs,na.rm=TRUE))
   out = data.frame(names(mean.out), round(mean.out, 4), t(round(quantile.out, 4)))
   names(out) <- c("time", "sum.stat", "ci.lower", "ci.upper")
   return(out)
-  
-  
-}
+  }
 
 boot.val <- function(val, n.boot, probs, fun="mean"){
   
@@ -147,7 +141,7 @@ time.country <- function(value,data){
   for (i in 1:length(country)){
     country.data<-cbind(country[i],
                         calc.boot(value[data$country.code==country[i]], 
-                                  sample$week[data$country.code==country[i]], 
+                                  data$week[data$country.code==country[i]], 
                                   n.boot=10, probs=c(0.025, 0.975),
                                   fun="mean"))
     out<-rbind(out,country.data)}
