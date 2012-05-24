@@ -101,7 +101,7 @@ qa.count.sub<-drop.levels(qa.count[qa.count$country.code %in% country.sub,])
 
 calc.boot <- function(value, 
                       time, 
-                      n.boot=10, 
+                      n.boot=1000, 
                       probs=c(0.025, 0.975),
                       fun="mean"){
   val.time <- split(value,time)
@@ -142,7 +142,7 @@ time.country <- function(value,data){
     country.data<-cbind(country[i],
                         calc.boot(value[data$country.code==country[i]], 
                                   data$week[data$country.code==country[i]], 
-                                  n.boot=10, probs=c(0.025, 0.975),
+                                  n.boot=1000, probs=c(0.025, 0.975),
                                   fun="mean"))
     out<-rbind(out,country.data)}
   return(out)
