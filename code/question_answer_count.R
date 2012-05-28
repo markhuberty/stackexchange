@@ -16,8 +16,8 @@ names(qa.count)<-c("user","week","post.type.1",
                    "question.count","post.type.2","answer.count")
 
 #change all NAs to 0
-qa.count$question.count<-ifelse(is.na(qa.count$question.count),0,1)
-qa.count$answer.count<-ifelse(is.na(qa.count$answer.count),0,1)
+qa.count$question.count<-ifelse(is.na(qa.count$question.count),0,qa.count$question.count)
+qa.count$answer.count<-ifelse(is.na(qa.count$answer.count),0,qa.count$answer.count)
 
 #proportion of question counts by user
 qa.count$question.proportion<-qa.count$question.count/
@@ -150,6 +150,13 @@ time.country <- function(value,data){
 
 mean.cum.q.p <- time.country(qa.count.sub$cum.question.proportion,qa.count.sub)
 names(mean.cum.q.p)<-c("country.code","week","mean","ci.lower","ci.upper")
+mean.cum.q.p$mean<-ifelse(is.nan(mean.cum.q.p$mean),0,mean.cum.q.p$mean)
+
+mean.cum.q.p$ci.lower<-ifelse(is.na(mean.cum.q.p$ci.lower),0,mean.cum.q.p$ci.lower)
+
+mean.cum.q.p$ci.upper<-ifelse(is.na(mean.cum.q.p$ci.upper),0,mean.cum.q.p$ci.upper)
+
+#plotting
 
 pdf("/mnt/fwire_80/stackexchange/mean_cum_question_proportion_new.pdf")
 plot1 <- ggplot(mean.cum.q.p,
