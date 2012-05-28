@@ -16,7 +16,7 @@ sample<- read.csv("C:/Users/miaomiaocui/stackexchange/data/qa_count_sample.csv",
 
 calc.boot <- function(value, 
                       time, 
-                      n.boot=10, 
+                      n.boot=1000, 
                       probs=c(0.025, 0.975),
                       fun="mean"){
   
@@ -62,15 +62,22 @@ time.country <- function(value,data){
   for (i in 1:length(country)){
     country.data<-cbind(country[i],
                calc.boot(value[data$country.code==country[i]], 
-                         sample$week[data$country.code==country[i]], 
-                         n.boot=10, probs=c(0.025, 0.975),
+                         data$week[data$country.code==country[i]], 
+                         n.boot=1000, probs=c(0.025, 0.975),
                          fun="mean"))
     out<-rbind(out,country.data)}
   return(out)
 }
     
+
 mean.cum.q.p <- time.country(sample$cum.question.proportion,sample)
 names(mean.cum.q.p)<-c("country.code","week","mean","ci.lower","ci.upper")
+
+mean.cum.q.p$mean<-ifelse(is.nan(mean.cum.q.p$mean),0,mean.cum.q.p$mean)
+
+mean.cum.q.p$ci.lower<-ifelse(is.na(mean.cum.q.p$ci.lower),0,mean.cum.q.p$ci.lower)
+
+mean.cum.q.p$ci.upper<-ifelse(is.na(mean.cum.q.p$ci.upper),0,mean.cum.q.p$ci.upper)
 
 #point-range plot
 plot1 <- ggplot(mean.cum.q.p,
@@ -90,7 +97,7 @@ print(plot1)
 plot2 <- ggplot(mean.cum.q.p,
                 aes(x=week,y=mean)) +
               geom_ribbon(aes(ymin=ci.lower,
-                               ymax=ci.upper)) + 
+                               ymax=ci.upper),alpha=0.5) + 
                   geom_line()+
                   facet_wrap(~country.code)+
                   opts(title="Mean cumulative proportion of questions by country, 95% CI",

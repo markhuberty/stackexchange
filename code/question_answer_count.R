@@ -169,6 +169,6 @@ plot1 <- ggplot(mean.cum.q.p,
                   geom_pointrange() + 
                   facet_wrap(~country.code)+
                   opts(title="Mean cumulative proportion of questions by country, 95% CI",
-                       axis.text.x=theme_text(hjust=1,angle=90,size=6))
+                       axis.text.x=theme_text(hjust=1,angle=90,size=3))
 print(plot1)
 dev.off()
