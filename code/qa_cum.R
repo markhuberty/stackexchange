@@ -2,7 +2,7 @@ library(reshape)
 library(ggplot2)
 library(Hmisc)
 library(gdata)
-
+library(foreach)
 
 #load question_answer_count data
 q.a.count <- 
