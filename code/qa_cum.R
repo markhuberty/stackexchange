@@ -57,16 +57,14 @@ cc<-read.csv("/mnt/fwire_80/stackexchange/users_geocoded_final.csv",header=TRUE)
 
 code<-data.frame(cc$Id,cc$country.code)
 
-qa.count<-merge(qa.cum,code,by.x="X1",by.y="cc.Id",all=FALSE)
+qa.cum<-merge(qa.cum,code,by.x="X1",by.y="cc.Id",all=FALSE)
 
-names(qa.count)<-c("user","time","cum.question.count",
+names(qa.cum)<-c("user","time","cum.question.count",
                    "cum.answer.count","cum.question.proportion","country.code")
 
 #write out csv file
-write.csv(qa.cum,
-          file="/mnt/fwire_80/stackexchange/qa_cum.csv",
+write.csv(qa.cum,file="/mnt/fwire_80/stackexchange/qa_cum.csv",
           row.names=FALSE)
-
 
 
 #take out countries that we do not care about
