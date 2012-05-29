@@ -6,7 +6,7 @@ library(gdata)
 
 #load question_answer_count data
 q.a.count <- 
-read.csv("/mnt/fwire_80/stackexchange/question_answer_counts.csv",header=TRUE)
+  read.csv("/mnt/fwire_80/stackexchange/question_answer_counts.csv",header=TRUE)
 names(q.a.count) <- c("week","user","post.type","count")
 q<-drop.levels(q.a.count[q.a.count$post.type==1,])
 a<-drop.levels(q.a.count[q.a.count$post.type==2,])
@@ -18,26 +18,6 @@ names(qa.count)<-c("user","week","post.type.1",
 #change all NAs to 0
 qa.count$question.count<-ifelse(is.na(qa.count$question.count),0,qa.count$question.count)
 qa.count$answer.count<-ifelse(is.na(qa.count$answer.count),0,qa.count$answer.count)
-
-#proportion of question counts by user
-qa.count$question.proportion<-qa.count$question.count/
-  (qa.count$question.count+qa.count$answer.count)
-
-#merge in country code
-cc<-read.csv("/mnt/fwire_80/stackexchange/users_geocoded_final.csv",header=TRUE)
-
-code<-data.frame(cc$Id,cc$country.code)
-
-qa.count<-merge(qa.count,code,by.x="user",by.y="cc.Id",all=FALSE)
-
-names(qa.count)<-c("user","week","post.type1",
-                   "question.count","post.type2",
-                   "answer.count","question.proportion","country.code")
-
-#write out csv file
-write.csv(qa.count,
-          file="/mnt/fwire_80/stackexchange/question_proportion.csv",
-          row.names=FALSE)
 
 #sort weeks
 out<-strsplit(as.character(qa.count$week),"/")
@@ -54,48 +34,50 @@ qa.count$time<-qa.count$X1year*1e2+qa.count$X2week
 #sort by user then by time
 qa.count<-qa.count[order(qa.count$user,qa.count$time),]
 
-#cumulative count
-qa.count$cum.question.count<-unlist(tapply(
-  qa.count$question.count,factor(qa.count$user),cumsum))
+#calculate cumulative counts
+qa.cum<- foreach(x=unique(qa.count$user), .combine="rbind") %:% 
+  foreach(y=sort(unique(qa.count$time)), .combine="rbind") %do% {
+    
+    cum.question.count <- sum(qa.count$question.count[qa.count$user==x & qa.count$time <= y],
+                              na.rm=TRUE)
+    cum.answer.count <- sum(qa.count$answer.count[qa.count$user==x & qa.count$time <= y], 
+                            na.rm=TRUE)
+    
+    out <- c(x, y, cum.question.count, cum.answer.count)
+    
+    return(out)
+  }
 
-qa.count$cum.answer.count<-unlist(tapply(
-  qa.count$answer.count,factor(qa.count$user),cumsum))
+qa.cum <- data.frame(qa.cum)
 
-qa.count$cum.question.proportion<-qa.count$cum.question.count/
-  (qa.count$cum.question.count+qa.count$cum.answer.count)
+qa.cum$X5 <- qa.cum$X3/(qa.cum$X3+qa.cum$X4)
+
+#merge in country code
+cc<-read.csv("/mnt/fwire_80/stackexchange/users_geocoded_final.csv",header=TRUE)
+
+code<-data.frame(cc$Id,cc$country.code)
+
+qa.count<-merge(qa.cum,code,by.x="X1",by.y="cc.Id",all=FALSE)
+
+names(qa.count)<-c("user","time","cum.question.count",
+                   "cum.answer.count","cum.question.proportion","country.code")
+
+#write out csv file
+write.csv(qa.cum,
+          file="/mnt/fwire_80/stackexchange/qa_cum.csv",
+          row.names=FALSE)
+
+
 
 #take out countries that we do not care about
 country.sub <- c("AU","US","GB","DE","NO","SE","SK","NL","LV","LI","ES","EE",
                  "PL","IT","PT","FI","DK","FR","CA","IE","NZ","IL","LU","BE",
                  "SI","CH","BG","RO","HU","GR","AT","MT","CY","CZ","RU","MX",
                  "JP")
-qa.count.sub<-drop.levels(qa.count[qa.count$country.code %in% country.sub,])
-# 
-# #random sampling
-# random.sample <- function(qa,total){
-#   #get sample size, with proportion of counts by country, share of total
-#   sample.proportion<-summary(qa$country.code)/sum(sample.proportion)
-#   #get sample size
-#   sample.size <- round(sample.proportion * total)
-#   
-#   country.names<-names(sample.size)
-#   
-#   out <- NULL
-#   for(i in 1:length(country.names))
-#   {
-#     data=qa[qa$country.code==country.names[i],]
-#     unique.users=unique(data$user)
-#     user.to.keep=sample(unique.users, sample.size[[i]],replace=FALSE)
-#     data.to.keep=data[data$user %in% user.to.keep,]
-#     out <- rbind(out,data.to.keep)}
-#   return(out)
-# }
-# 
-# qa.count.sample<-random.sample(qa.count.sub,1000)
-# write.csv(qa.count.sample,
-#           file="/mnt/fwire_80/stackexchange/qa_count_sample.csv",
-#           row.names=FALSE)
+qa.cum.sub<-drop.levels(qa.cum[qa.cum$country.code %in% country.sub,])
 
+#factorize time
+qa.cum$week <- factor(qa.cum$time)
 
 #using bootstrap to calculate mean,med and 95% CI
 
@@ -106,15 +88,15 @@ calc.boot <- function(value,
                       fun="mean"){
   val.time <- split(value,time)
   out <- lapply(val.time, function(x){
-          boot.val(x, n.boot, probs, fun)
-          }
+    boot.val(x, n.boot, probs, fun)
+  }
                 )
   mean.out = sapply(out, function(x) mean(x, na.rm=TRUE))
   quantile.out = sapply(out, function(x) quantile(x, probs=probs,na.rm=TRUE))
   out = data.frame(names(mean.out), round(mean.out, 4), t(round(quantile.out, 4)))
-  names(out) <- c("time", "sum.stat", "ci.lower", "ci.upper")
+  names(out) <- c("week", "sum.stat", "ci.lower", "ci.upper")
   return(out)
-  }
+}
 
 boot.val <- function(val, n.boot, probs, fun="mean"){
   
@@ -141,24 +123,19 @@ time.country <- function(value,data){
   for (i in 1:length(country)){
     country.data<-cbind(country[i],
                         calc.boot(value[data$country.code==country[i]], 
-                                  data$week[data$country.code==country[i]], 
+                                  data$time[data$country.code==country[i]], 
                                   n.boot=1000, probs=c(0.025, 0.975),
                                   fun="mean"))
     out<-rbind(out,country.data)}
   return(out)
 }
 
-mean.cum.q.p <- time.country(qa.count.sub$cum.question.proportion,qa.count.sub)
+mean.cum.q.p <- time.country(qa.cum.sub$cum.question.proportion,qa.cum.sub)
 names(mean.cum.q.p)<-c("country.code","week","mean","ci.lower","ci.upper")
-mean.cum.q.p$mean<-ifelse(is.nan(mean.cum.q.p$mean),0,mean.cum.q.p$mean)
-
-mean.cum.q.p$ci.lower<-ifelse(is.na(mean.cum.q.p$ci.lower),0,mean.cum.q.p$ci.lower)
-
-mean.cum.q.p$ci.upper<-ifelse(is.na(mean.cum.q.p$ci.upper),0,mean.cum.q.p$ci.upper)
 
 #plotting
 
-pdf("/mnt/fwire_80/stackexchange/mean_cum_question_proportion_new.pdf")
+pdf("/mnt/fwire_80/stackexchange/mean_cum_question_proportion_3.pdf")
 plot1 <- ggplot(mean.cum.q.p,
                 aes(x=week,
                     y=mean,
@@ -167,6 +144,19 @@ plot1 <- ggplot(mean.cum.q.p,
                     )
                 ) +
                   geom_pointrange() + 
+                  facet_wrap(~country.code)+
+                  opts(title="Mean cumulative proportion of questions by country, 95% CI",
+                       axis.text.x=theme_text(hjust=1,angle=90,size=3))
+print(plot1)
+dev.off()
+
+pdf("/mnt/fwire_80/stackexchange/mean_cum_question_proportion_4.pdf")
+plot1 <- ggplot(mean.cum.q.p,
+                aes(x=week,
+                    y=mean
+                    )) +
+                  geom_line() + 
+                  geom_ribbon(aes(ymin=ci.lower,ymax=ci.upper),alph=0.5)+
                   facet_wrap(~country.code)+
                   opts(title="Mean cumulative proportion of questions by country, 95% CI",
                        axis.text.x=theme_text(hjust=1,angle=90,size=3))
