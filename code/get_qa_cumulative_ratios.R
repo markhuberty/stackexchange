@@ -42,68 +42,60 @@ qa.count$X2week<-as.numeric(as.character(qa.count$X2))
 #format the year and week into numbers like 200900025
 qa.count$time<-qa.count$X1year*1e2+qa.count$X2week
 
-#registerDoMC(3)
-#calculate cumulative counts
-## Downsample something here for kicks:
-users.sub <- sample(unique(qa.count$user, 1000))
-qa.count <- qa.count[qa.count$user %in% users.sub,]
 
-## Basic idea:
-## For each user, get their count vector
-## Blow it out into all timestamps; replace NA with 0
-## cumsum it
-## return
-
-
+## Faster version of the nested loop:
+## 1. blow out the count vector to have one entry per timestamp
+## 2. cumsum the resulting count vector to get one cumsum per time
+##    stamp
+## 3. return
 cumsum.count <- function(user, user.times, user.count, unique.times){
   unique.times <- sort(unique.times)
   full.timevec <- sapply(unique.times, function(x){
     if(x %in% user.times)
       {
         idx <- which(user.times == x)
-        return(user.count[x])
-        
+        return(user.count[idx])
       }else{
-
         return(0)
-        
       }
   })
-
+  full.timevec <- unlist(full.timevec)
   cum.counts <- cumsum(full.timevec)
   return(cum.counts)
 
 }
 
-system.time(
-            unique.times <- sort(unique(qa.count$time))
-            qa.cum <- foreach(x=unique(qa.count$user, .combine=rbind) %do% {
 
-              user.times <- qa.count$time[qa.count$user==x]
-              question.counts <- cumsum.count(x,
-                                              user.times,
-                                              qa.count$question.count,
-                                              unique.times
-                                              )
-              answer.counts <- cumsum.count(x,
-                                            user.times,
-                                            qa.count$answer.count,
-                                            unique.times
-                                            )
-              qa.ratio <- question.counts / (question.counts + answer.counts)
-              out <- cbind(x, unique.times, question.counts, answer.counts,
-                           qa.ratio)
-              names(out) <- c("user", "time", "q.count", "a.count", "qa.ratio")
-              return(out)
-              
+registerDoMC(3)
+unique.times <- sort(unique(qa.count$time))
+qa.cum <- foreach(x=unique(qa.count$user), .combine=rbind) %dopar% {
+  user.idx <- qa.count$user == x
+  user.times <- qa.count$time[user.idx]
+  user.question.count <- qa.count$question.count[user.idx]
+  user.answer.count <- qa.count$answer.count[user.idx]
+  
+  question.counts <-
+    cumsum.count(x,
+                 user.times,
+                 user.question.count,
+                 unique.times
+                 )
+  answer.counts <-
+    cumsum.count(x,
+                 user.times,
+                 user.answer.count,
+                 unique.times
+                 )
+  qa.ratio <- question.counts / (question.counts + answer.counts)
+  out <- cbind(x, unique.times, question.counts, answer.counts,
+               qa.ratio)
+  colnames(out) <- c("user", "time", "q.count", "a.count", "qa.ratio")
+  return(out)
+  
+}
 
-            }
-                              )
-## colnames(qa.cum) <- c("user", "time", "q.count", "a.count",
-##                       "q.a.ratio")
-
-## write.csv(qa.cum, file="/mnt/fwire_80/stackexchange/meh_qa_count.csv",
-##           row.names=FALSE
-##           )
-## quit()
+write.csv(qa.cum, file="/mnt/fwire_80/stackexchange/meh_qa_count.csv",
+          row.names=FALSE
+          )
+quit()
 ## ## Done
