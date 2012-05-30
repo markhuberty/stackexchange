@@ -35,6 +35,15 @@ qa.count$time<-qa.count$X1year*1e2+qa.count$X2week
 qa.count<-qa.count[order(qa.count$user,qa.count$time),]
 
 #calculate cumulative counts
+cumulate.qa.counts <- function(users, questions, answers, timestamps){
+  unique.users <- sort(unique(users))
+  unique.times <- sort(unique(timestamps))
+  
+  
+
+}
+
+
 qa.cum<- foreach(x=unique(qa.count$user), .combine="rbind") %:% 
   foreach(y=sort(unique(qa.count$time)), .combine="rbind") %do% {
     
