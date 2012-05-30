@@ -48,24 +48,57 @@ qa.count$time<-qa.count$X1year*1e2+qa.count$X2week
 users.sub <- sample(unique(qa.count$user, 1000))
 qa.count <- qa.count[qa.count$user %in% users.sub,]
 
+## Basic idea:
+## For each user, get their count vector
+## Blow it out into all timestamps; replace NA with 0
+## cumsum it
+## return
+
+
+cumsum.count <- function(user, user.times, user.count, unique.times){
+  unique.times <- sort(unique.times)
+  full.timevec <- sapply(unique.times, function(x){
+    if(x %in% user.times)
+      {
+        idx <- which(user.times == x)
+        return(user.count[x])
+        
+      }else{
+
+        return(0)
+        
+      }
+  })
+
+  cum.counts <- cumsum(full.timevec)
+  return(cum.counts)
+
+}
+
 system.time(
-            qa.cum<- foreach(x=unique(qa.count$user), .combine="rbind") %:% 
-            foreach(y=sort(unique(qa.count$time)), .combine="rbind") %dopar% {
-              
-              cum.question.count <-
-                sum(qa.count$question.count[qa.count$user==x & qa.count$time <= y],
-                    na.rm=TRUE)
-              cum.answer.count <-
-                sum(qa.count$answer.count[qa.count$user==x & qa.count$time <= y], 
-                    na.rm=TRUE)
+            unique.times <- sort(unique(qa.count$time))
+            qa.cum <- foreach(x=unique(qa.count$user, .combine=rbind) %do% {
 
-              qa.ratio <- cum.question.count / (cum.question.count + cum.answer.count)
-              out <- c(x, y, cum.question.count, cum.answer.count, qa.ratio)
-              
+              user.times <- qa.count$time[qa.count$user==x]
+              question.counts <- cumsum.count(x,
+                                              user.times,
+                                              qa.count$question.count,
+                                              unique.times
+                                              )
+              answer.counts <- cumsum.count(x,
+                                            user.times,
+                                            qa.count$answer.count,
+                                            unique.times
+                                            )
+              qa.ratio <- question.counts / (question.counts + answer.counts)
+              out <- cbind(x, unique.times, question.counts, answer.counts,
+                           qa.ratio)
+              names(out) <- c("user", "time", "q.count", "a.count", "qa.ratio")
               return(out)
-            }
-            )
+              
 
+            }
+                              )
 ## colnames(qa.cum) <- c("user", "time", "q.count", "a.count",
 ##                       "q.a.ratio")
 
