@@ -39,6 +39,7 @@ print len(idx_top_tags)
 tag_matrix = tag_matrix[:,idx_top_tags]
 unique_tags = [unique_tags[i] for i in idx_top_tags]
 tag_frequency = [tag_frequency[i] for i in idx_top_tags]
+
 ## Generate the co-occurrance matrix
 ## Multiply. This should return a count(tags) * count(tags) matrix
 ## where the cells are counts of co-occurance between tags
@@ -50,21 +51,12 @@ tag_matrix_multiply = tag_matrix_multiply.asfptype()
 ## co-incidence. First strip out the diagonal.
 
 row_indices, col_indices = tag_matrix_multiply.nonzero()
-#to_keep = [idx for idx, r in enumerate(row_indices) if row_indices[idx] != col_indices[idx]]
-#row_indices = [row_indices[idx] for idx in to_keep]
-#col_indices = [col_indices[idx] for idx in to_keep]
 tag_frequencies = [tag_frequency[i] for i in col_indices]
 
 
 for d in range(len(tag_matrix_multiply.data)):
     tag_matrix_multiply.data[d] = tag_matrix_multiply.data[d] / tag_frequencies[d]
 
-                                    
-print 'Done with the proximity calculation'    
-
-filename='../data/tag_proximity_csc.pickle'
-with open(filename, 'wt') as f:
-    pickle.dump(tag_matrix_multiply, f)
 
 
 ## Create the nx graph and add the top tags as nodes
@@ -81,33 +73,11 @@ edges = [(unique_tags[r], unique_tags[c], 1-tag_matrix_multiply[r,c] + eps)
          for r, c in zip(row_indices, col_indices) 
          ]
 edgeweights = [e[2] for e in edges]
-edgeweights_max = np.array(edgeweights).mean()
 
 g_tag.add_weighted_edges_from(edges)
 
 ## Write out for mcl clustering
 
-    
-def write_mcl_format(g, filename):
-    """
-    Takes as input a networkx graph g and a valid filepath as a string. Writes
-    the graph edgelist with weights to a text file of format E1 E2 W,
-    consistent with the file format required by the mcl algorithm.
-
-    See http://www.micans.org/mcl/ for more detail on mcl.
-    """    
-    edges = g.edges()
-    weights = nx.get_edge_attributes(g, 'weight')
-    conn = open(filename, 'wt')
-    ## Note the weight inversion here; again, 
-    for i, e in enumerate(edges):
-        out = map(lambda(x): str(x), [e[0], e[1], 1-weights[e]])
-        conn.write(' '.join(out))
-        conn.write('\n')
-    conn.close()
-    return 'Done'
-
-write_mcl_format(g_tag, '../data/g_tag_mcl.txt')
 
 ## Calculate betweenneess for node importance to the
 ## structure; then sort
@@ -129,15 +99,9 @@ conn.close()
 ## And generate the MST w/ Kruskal's alg
 mst = nx.minimum_spanning_tree(g_tag)
 
-## Here, want to do layout and then add back in some edges
-## See the innovation_space code for details
-## Size would be nice, too
-
 ## Add in extra edges and colors
 supp_edgelist = [(e[0], e[1], e[2]) for e in edges if e[2] < 0.5]
 mst.add_weighted_edges_from(supp_edgelist)
-
-write_mcl_format(mst, '../data/g_tag_mst_mcl.txt')
 
 edge_weights = nx.get_edge_attributes(mst, 'weight')
 edge_color = np.array([1-edge_weights[k] for k in edge_weights.keys()])
@@ -145,13 +109,16 @@ node_labels = {}
 for n in mst.nodes():
     node_labels[n] = n
 
-prox_graph_full_layout = nx.graphviz_layout(mst, prog='neato')
+## Set node size proportionate to betweenness:
+nodesize = [tag_betweenness[n] * 10 for n in mst.nodes()]
+
+prox_graph_full_layout = nx.graphviz_layout(mst, prog='sfdp')
 
 nx.draw_networkx_nodes(mst,
                        prox_graph_full_layout,
                        alpha=0.6,
-                       node_size=4,
-                       linewidths=0.2,
+                       node_size=nodesize,
+                       linewidths=0.1,
                        )
 nx.draw_networkx_labels(mst,
                         prox_graph_full_layout,
