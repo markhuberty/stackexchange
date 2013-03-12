@@ -26,75 +26,28 @@ f.close()
 unique_tags = tag_object['unique_tags']
 tag_matrix = tag_object['tag_matrix']
 
-## Calculate absolute term occurrance freq. as column sum of the 
-## post-term matrix
-tag_frequency = tag_matrix.sum(axis=0)
-tag_frequency = [tag_frequency[0,i] for i in range(tag_frequency.shape[1])]
-tag_frequency = np.array(tag_frequency)
-
-## Take only the top tags based on median tag counts
-bool_top_tags = tag_frequency >= np.median(tag_frequency)
-idx_top_tags = [i for i,b in enumerate(bool_top_tags) if b]
-print len(idx_top_tags)
-tag_matrix = tag_matrix[:,idx_top_tags]
-unique_tags = [unique_tags[i] for i in idx_top_tags]
-tag_frequency = [tag_frequency[i] for i in idx_top_tags]
-
-## Generate the co-occurrance matrix
-## Multiply. This should return a count(tags) * count(tags) matrix
-## where the cells are counts of co-occurance between tags
-tag_matrix_multiply = tag_matrix.transpose() * tag_matrix
-tag_matrix_multiply = tag_matrix_multiply.asfptype() 
-
-
-## Divide out the colsums to get the conditional probability of 
-## co-incidence. First strip out the diagonal.
-
-row_indices, col_indices = tag_matrix_multiply.nonzero()
-tag_frequencies = [tag_frequency[i] for i in col_indices]
-
-
-for d in range(len(tag_matrix_multiply.data)):
-    tag_matrix_multiply.data[d] = tag_matrix_multiply.data[d] / tag_frequencies[d]
-
 
 
 ## Create the nx graph and add the top tags as nodes
 g_tag = nx.Graph()
 
 ## Then add the edges as weights
-## Takes the max values
+## Note that the matrix is square but not symmetric. So
+## we take the maximum of the two coocurrance frequencies.
 ## Add a small value to each edgeweight to make sure that even
 ## 0-proximity edges have some weight.
 eps = 0.00001
-edges = [(unique_tags[r], unique_tags[c], 1-tag_matrix_multiply[r,c] + eps)
-         if tag_matrix_multiply[r,c] > tag_matrix_multiply[c,r] else
-         (unique_tags[c], unique_tags[r], 1-tag_matrix_multiply[c,r] + eps)
+edges = [(unique_tags[r], unique_tags[c], 1-tag_matrix[r,c] + eps)
+         if tag_matrix[r,c] > tag_matrix[c,r] else
+         (unique_tags[c], unique_tags[r], 1-tag_matrix[c,r] + eps)
          for r, c in zip(row_indices, col_indices) 
          ]
 edgeweights = [e[2] for e in edges]
 
 g_tag.add_weighted_edges_from(edges)
 
-## Write out for mcl clustering
-
-
 ## Calculate betweenneess for node importance to the
 ## structure; then sort
-tag_betweenness = nx.betweenness_centrality(g_tag)
-btwn_sorted = sorted(tag_betweenness.iteritems(),
-                     key=operator.itemgetter(1),
-                     reverse=True
-                     )
-
-## Write out the betweeness data to a csv file
-conn = open('../data/tag_betweenness.csv', 'wt')
-writer = csv.writer(conn)
-writer.writerow(['node', 'btwnness'])
-for k in btwn_sorted.keys():
-    writer.writerow([k, btwn_sorted[k]])
-conn.close()
-    
 
 ## And generate the MST w/ Kruskal's alg
 mst = nx.minimum_spanning_tree(g_tag)
@@ -103,15 +56,43 @@ mst = nx.minimum_spanning_tree(g_tag)
 supp_edgelist = [(e[0], e[1], e[2]) for e in edges if e[2] < 0.5]
 mst.add_weighted_edges_from(supp_edgelist)
 
+tag_betweenness = nx.betweenness_centrality(mst)
+btwn_sorted = sorted(tag_betweenness.iteritems(),
+                     key=operator.itemgetter(1),
+                     reverse=True
+                     )
+
+
+## Color edges so that more proximate (closer) values are more intense
 edge_weights = nx.get_edge_attributes(mst, 'weight')
 edge_color = np.array([1-edge_weights[k] for k in edge_weights.keys()])
+
+## Set node size and label
+## First load up the cluster membership
+## Load up the MST clusters
+with open(mst_filename, 'rt') as f:
+    mst_clusters = [re.sub('\n', '', line).split(' ') for line in f]
+
+## Now for each cluster, find the tag with the largest betweenness
+## And label it; ignore the rest of the labels
+core_tags = set()
+for cluster in mst_clusters:
+    btwn_vec = [tag_betweenness[n] for n in cluster]
+    idx_max = np.argmax(btwn_vec)
+    tag_max = cluster[idx_max]#, btwn_vec[idx_max])
+    set.add(tag_max)
+
 node_labels = {}
 for n in mst.nodes():
-    node_labels[n] = n
+    if n in core_tags:
+        node_labels[n] = n
+    else:
+        node_labels[n] = ''
 
 ## Set node size proportionate to betweenness:
 nodesize = [tag_betweenness[n] * 10 for n in mst.nodes()]
 
+    
 prox_graph_full_layout = nx.graphviz_layout(mst, prog='sfdp')
 
 nx.draw_networkx_nodes(mst,
@@ -123,23 +104,21 @@ nx.draw_networkx_nodes(mst,
 nx.draw_networkx_labels(mst,
                         prox_graph_full_layout,
                         labels=node_labels,
-                        font_size=0.5
+                        font_size=2,
+                        font_color='red',
+                        font_weight='bold'
                         )
 nx.draw_networkx_edges(mst,
                        prox_graph_full_layout,
-                       linewidths=0.5,
+                       linewidths=0.1,
                        edge_color=edge_color,
-                       edge_cmap=plt.cm.get_cmap('BrBG'),
+                       edge_cmap=plt.cm.get_cmap('Blues'),
                        edge_vmin=edge_color.min(),
                        edge_vmax=edge_color.max()
                        )
 plt.colorbar()
-plt.savefig('../figures/tag_association_mst_full.pdf')
+plt.savefig('../figures/tag_association_tree.pdf')
 plt.close()
-
-## Right now, this plots but is really very messed up
-## Need to use graphviz instead to get the plotting right. 
-## NEATO layout should work better
 
         
         
