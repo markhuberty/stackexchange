@@ -88,12 +88,12 @@ btwn_sorted = sorted(tag_betweenness.iteritems(),
                      )
 
 ## Write out the betweeness data to a csv file
-conn = open('../data/tag_betweenness.csv', 'wt')
-writer = csv.writer(conn)
-writer.writerow(['node', 'btwnness'])
-for k in btwn_sorted.keys():
-    writer.writerow([k, btwn_sorted[k]])
-conn.close()
+# conn = open('../data/tag_betweenness.csv', 'wt')
+# writer = csv.writer(conn)
+# writer.writerow(['node', 'btwnness'])
+# for k in btwn_sorted.keys():
+#     writer.writerow([k, btwn_sorted[k]])
+# conn.close()
     
 
 ## And generate the MST w/ Kruskal's alg

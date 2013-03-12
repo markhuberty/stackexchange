@@ -4,7 +4,7 @@ library(Hmisc)
 library(gdata)
 library(foreach)
 library(doMC)
-
+setwd("~/")
 #load question_answer_count data
 q.a.count <- 
   read.csv("/mnt/fwire_80/stackexchange/question_answer_counts.csv",header=TRUE)
@@ -66,9 +66,11 @@ cumsum.count <- function(user, user.times, user.count, unique.times){
 }
 
 
-registerDoMC(3)
+#registerDoMC(3)
 unique.times <- sort(unique(qa.count$time))
-qa.cum <- foreach(x=unique(qa.count$user), .combine=rbind) %dopar% {
+#writeLines("", "qa.log")
+qa.cum <- foreach(x=unique(qa.count$user), .combine=rbind) %do% {
+  ptm <- proc.time()
   user.idx <- qa.count$user == x
   user.times <- qa.count$time[user.idx]
   user.question.count <- qa.count$question.count[user.idx]
@@ -91,11 +93,14 @@ qa.cum <- foreach(x=unique(qa.count$user), .combine=rbind) %dopar% {
                qa.ratio)
   colnames(out) <- c("user", "time", "q.count", "a.count", "qa.ratio")
   return(out)
-  
+  ptm <- ptm - proc.time()
+  sink("qa.log", append=TRUE)
+  cat(paste("Iteration time:", ptm, "\n"))
+  sink()
 }
 
-write.csv(qa.cum, file="/mnt/fwire_80/stackexchange/meh_qa_count.csv",
-          row.names=FALSE
-          )
-quit()
+## write.csv(qa.cum, file="/mnt/fwire_80/stackexchange/meh_qa_count.csv",
+##           row.names=FALSE
+##           )
+## quit()
 ## ## Done
