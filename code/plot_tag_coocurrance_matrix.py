@@ -8,6 +8,8 @@ import matplotlib as mpl
 mpl.use('Agg') ## Allows mpl to function w/o active X session
 import matplotlib.pyplot as plt
 import operator
+import csv
+import re
 
 os.chdir('/home/markhuberty/Documents/stackexchange/code/')
 ## Load the sparse matrix of COUNT(posts) * COUNT(unique tags)
@@ -65,13 +67,6 @@ mst.add_weighted_edges_from(supp_edgelist)
 
 ## Calculate betweenneess for node importance to the
 ## structure; then sort
-tag_degree = nx.degree_centrality(mst)
-btwn_sorted = sorted(tag_degree.iteritems(),
-                     key=operator.itemgetter(1),
-                     reverse=True
-                     )
-
-
 ## Color edges so that more proximate (closer) values are more intense
 edge_weights = nx.get_edge_attributes(mst, 'weight')
 edge_color = np.array([1-edge_weights[k] for k in edge_weights.keys()])
@@ -83,8 +78,9 @@ mst_filename = '../data/mcl_out/cluster_labels_mst_I50'
 with open(mst_filename, 'rt') as f:
     mst_clusters = [re.sub('\n', '', line).split('\t') for line in f]
 
-## Now for each cluster, find the tag with the largest betweenness
-## And label it; ignore the rest of the labels
+
+## For labels, use the tag in the cluster with the greatest degree centrality
+tag_degree = nx.degree_centrality(mst)
 core_tags = set()
 for cluster in mst_clusters:
     btwn_vec = [tag_degree[n] for n in cluster]
@@ -92,7 +88,14 @@ for cluster in mst_clusters:
     tag_max = cluster[idx_max]#, btwn_vec[idx_max])
     core_tags.add(tag_max)
 
-degree_median = np.max([tag_degree[n] for n in tag_degree])
+## Write out the labels for later use
+with open('../data/mcl_I50_cluster_labels.csv', 'wt') as f:
+    writer = csv.writer(f)
+    writer.writerow(['cluster', 'label', 'degree'])
+    for idx, label in enumerate(core_tags):
+        writer.writerow([idx, label, tag_degree[label]])
+
+## Filter it so that we can still see the plot    
 node_labels = {}
 for n in mst.nodes():
     if n in core_tags and tag_degree[n] > 0.003:
@@ -103,7 +106,7 @@ for n in mst.nodes():
 ## Set node size proportionate to betweenness:
 nodesize = [tag_degree[n] * 100 for n in mst.nodes()]
 
-    
+## Lay it out. SFDP works better on this large graph.
 prox_graph_full_layout = nx.graphviz_layout(mst, prog='sfdp')
 
 nx.draw_networkx_edges(mst,
@@ -115,7 +118,7 @@ nx.draw_networkx_edges(mst,
                        edge_vmin=edge_color.min(),
                        edge_vmax=edge_color.max()
                        )
-plt.colorbar()
+#plt.colorbar()
 nx.draw_networkx_nodes(mst,
                        prox_graph_full_layout,
                        alpha=0.6,
@@ -129,7 +132,8 @@ nx.draw_networkx_labels(mst,
                         font_color='red',
                         font_weight='bold'
                         )
-plt.savefig('../figures/tag_association_tree.pdf')
+plt.axis('off')
+plt.savefig('../figures/tag_association_tree.pdf', bbox_inches='tight')
 plt.close()
 
         
